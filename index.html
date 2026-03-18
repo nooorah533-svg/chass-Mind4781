@@ -1,13 +1,1160 @@
 <!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>My Google AI Studio App</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
-</html>
+<html lang="ar" dir="rtl" class="h-full">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>رِواق لقصص الفيزياء الصوتية</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
+  <script src="/_sdk/element_sdk.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Kufi+Arabic:wght@300;400;500;600;700;800;900&amp;display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            kufi: ['"Noto Kufi Arabic"', 'sans-serif']
+          },
+          colors: {
+            dpurple: '#1a0f2e',
+            mpurple: '#2d1b4e',
+            lpurple: '#7c3aed',
+            accent: '#ff9500',
+            glow: '#ff7700'
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    * { box-sizing: border-box; }
+    html, body { height: 100%; margin: 0; padding: 0; overflow: hidden; }
 
+    .screen { 
+      position: absolute; inset: 0; 
+      transition: transform 0.4s cubic-bezier(0.4,0,0.2,1), opacity 0.4s cubic-bezier(0.4,0,0.2,1);
+      overflow-y: auto; overflow-x: hidden;
+    }
+    .screen.hidden-right { transform: translateX(-100%); opacity: 0; pointer-events: none; }
+    .screen.hidden-left { transform: translateX(100%); opacity: 0; pointer-events: none; }
+    .screen.active { transform: translateX(0); opacity: 1; pointer-events: auto; }
+
+    .glow-btn {
+      background: linear-gradient(135deg, #f59e0b, #d97706);
+      box-shadow: 0 0 20px rgba(245,158,11,0.4), 0 0 40px rgba(217,119,6,0.2);
+      transition: all 0.3s;
+    }
+    .glow-btn:hover { box-shadow: 0 0 30px rgba(245,158,11,0.6), 0 0 60px rgba(217,119,6,0.3); transform: scale(1.03); }
+    .glow-btn:active { transform: scale(0.97); }
+
+    .card-story {
+      background: linear-gradient(145deg, rgba(124,58,237,0.15), rgba(124,58,237,0.08));
+      border: 1px solid rgba(124,58,237,0.4);
+      backdrop-filter: blur(10px);
+      transition: all 0.3s;
+    }
+    .card-story:hover { border-color: rgba(124,58,237,0.6); transform: translateY(-2px); box-shadow: 0 8px 25px rgba(124,58,237,0.2); }
+
+    .nav-item { transition: all 0.3s; }
+    .nav-item.active-nav { color: #f59e0b; }
+    .nav-item.active-nav .nav-dot { opacity: 1; transform: scaleX(1); }
+    .nav-dot { opacity: 0; transform: scaleX(0); transition: all 0.3s; }
+
+    .progress-bar { transition: width 0.3s; }
+
+    .float-anim { animation: floaty 3s ease-in-out infinite; }
+    @keyframes floaty { 0%,100%{ transform: translateY(0); } 50%{ transform: translateY(-10px); } }
+
+    .pulse-glow { animation: pulseG 2s ease-in-out infinite; }
+    @keyframes pulseG { 0%,100%{ box-shadow: 0 0 20px rgba(245,158,11,0.4); } 50%{ box-shadow: 0 0 40px rgba(245,158,11,0.7), 0 0 60px rgba(217,119,6,0.4); } }
+
+    .fade-in { animation: fadeIn 0.5s ease-out; }
+    @keyframes fadeIn { from { opacity:0; transform: translateY(10px); } to { opacity:1; transform: translateY(0); } }
+
+    .stagger-1 { animation-delay: 0.1s; }
+    .stagger-2 { animation-delay: 0.2s; }
+    .stagger-3 { animation-delay: 0.3s; }
+    .stagger-4 { animation-delay: 0.4s; }
+
+    .bg-mesh {
+      background: radial-gradient(ellipse at 20% 20%, rgba(124,58,237,0.2) 0%, transparent 50%),
+                  radial-gradient(ellipse at 80% 80%, rgba(124,58,237,0.15) 0%, transparent 50%),
+                  linear-gradient(180deg, #1a0f2e 0%, #2d1b4e 100%);
+    }
+
+    .section-chip { transition: all 0.3s; }
+    .section-chip.active-chip { background: linear-gradient(135deg, #f59e0b, #d97706); color: white; box-shadow: 0 0 15px rgba(245,158,11,0.4); }
+
+    input, select {
+      background: rgba(124,58,237,0.2);
+      border: 1px solid rgba(124,58,237,0.5);
+      color: #ffffff;
+      transition: all 0.3s;
+    }
+    input:focus, select:focus { border-color: #7c3aed; box-shadow: 0 0 15px rgba(124,58,237,0.4); outline: none; }
+    select option { background: #2d1b4e; color: #ffffff; }
+
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(245,158,11,0.4); border-radius: 10px; }
+
+    .quiz-option { 
+      background: rgba(253,211,77,0.15); border: 1px solid rgba(245,158,11,0.3);
+      transition: all 0.3s; cursor: pointer;
+    }
+    .quiz-option:hover { border-color: rgba(245,158,11,0.7); background: rgba(253,211,77,0.3); }
+    .quiz-option.correct { background: rgba(16,185,129,0.2); border-color: #10b981; }
+    .quiz-option.wrong { background: rgba(239,68,68,0.2); border-color: #ef4444; }
+
+    .leaderboard-row { 
+      background: linear-gradient(145deg, rgba(253,211,77,0.2), rgba(254,243,199,0.15));
+      border: 1px solid rgba(245,158,11,0.25);
+    }
+    .leaderboard-row.top-1 { border-color: rgba(255,215,0,0.5); background: linear-gradient(145deg, rgba(255,215,0,0.2), rgba(253,211,77,0.3)); }
+    .leaderboard-row.top-2 { border-color: rgba(192,192,192,0.4); background: linear-gradient(145deg, rgba(192,192,192,0.1), rgba(196,181,253,0.2)); }
+    .leaderboard-row.top-3 { border-color: rgba(205,127,50,0.4); background: linear-gradient(145deg, rgba(205,127,50,0.1), rgba(196,181,253,0.2)); }
+
+    .play-btn-big {
+      background: linear-gradient(135deg, #f59e0b, #d97706);
+      box-shadow: 0 0 30px rgba(245,158,11,0.4);
+      transition: all 0.3s;
+    }
+    .play-btn-big:hover { box-shadow: 0 0 50px rgba(245,158,11,0.6); transform: scale(1.1); }
+  </style>
+  <style>body { box-sizing: border-box; }</style>
+  <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
+ </head>
+ <body class="h-full bg-dpurple font-kufi">
+  <!-- Phone Frame -->
+  <div id="app-wrapper" class="w-full h-full flex items-center justify-center bg-mesh overflow-hidden">
+   <div id="phone-frame" class="relative w-full h-full max-w-[430px] overflow-hidden" style="background: linear-gradient(180deg, #fef3c7, #fde68a);">
+    <!-- ===== SCREEN 1: SPLASH ===== -->
+    <div id="screen-splash" class="screen active bg-mesh flex flex-col items-center justify-center px-8 text-center">
+     <div class="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
+      <div class="absolute w-64 h-64 rounded-full" style="top:-10%;right:-20%;background:radial-gradient(circle,rgba(245,158,11,0.2),transparent 70%)"></div>
+      <div class="absolute w-48 h-48 rounded-full" style="bottom:10%;left:-15%;background:radial-gradient(circle,rgba(245,158,11,0.15),transparent 70%)"></div>
+     </div>
+     <div class="relative z-10">
+      <div class="float-anim mb-6">
+       <div class="w-28 h-28 mx-auto rounded-3xl pulse-glow flex items-center justify-center text-5xl" style="background: linear-gradient(135deg, rgba(245,158,11,0.3), rgba(217,119,6,0.2)); border: 1px solid rgba(245,158,11,0.3);">
+        🎧
+       </div>
+      </div>
+      <h1 id="splash-title" class="text-4xl font-bold text-black mb-2">رِواق</h1>
+      <p class="text-fbbf24 text-sm mb-1">لقصص الفيزياء الصوتية</p>
+      <div class="w-16 h-0.5 mx-auto my-4" style="background: linear-gradient(90deg, #7c3aed, #06b6d4);"></div>
+      <p id="splash-subtitle" class="text-gray-600 text-sm leading-relaxed mb-2">"هنا تتحول الفيزياء إلى قصة تُروى… لا تُحفظ"</p>
+      <p id="splash-school" class="text-gray-500 text-xs mt-2 mb-8">مجمع السحن</p><button onclick="navigateTo('screen-login')" class="glow-btn text-white font-semibold py-3 px-12 rounded-2xl text-lg"> ابدأ </button>
+      <div class="mt-10 text-gray-600 text-xs">
+       <p>المعلمة: نوره المالكي</p>
+       <p>القائدة: هله النفيعي</p>
+      </div>
+     </div>
+    </div><!-- ===== SCREEN 2: LOGIN ===== -->
+    <div id="screen-login" class="screen hidden-right bg-mesh flex flex-col px-6 pt-14">
+     <div class="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
+      <div class="absolute w-56 h-56 rounded-full" style="top:5%;left:-10%;background:radial-gradient(circle,rgba(157,127,209,0.12),transparent 70%)"></div>
+     </div>
+     <div class="relative z-10">
+      <button onclick="navigateTo('screen-splash','back')" class="text-glow mb-6 flex items-center gap-2 text-sm"> <i data-lucide="arrow-right" style="width:18px;height:18px;"></i> رجوع </button>
+      <div class="text-center mb-8">
+       <div class="text-5xl mb-3">
+        🎧
+       </div>
+       <h2 class="text-2xl font-bold" style="color:#4c1d95;">مرحباً بك</h2>
+       <p class="text-sm mt-1" style="color:#7c6ba3;">سجلي دخولك للبدء</p>
+      </div>
+      <form id="login-form" onsubmit="handleLogin(event)" class="space-y-5">
+       <div>
+        <label for="student-name" class="text-gray-600 text-sm block mb-2">اسم الطالبة</label> <input type="text" id="student-name" placeholder="أدخلي اسمك هنا..." class="w-full py-3 px-4 rounded-xl font-kufi text-sm" required>
+       </div>
+       <div>
+        <label for="student-grade" class="text-gray-600 text-sm block mb-2">الصف</label> <select id="student-grade" class="w-full py-3 px-4 rounded-xl font-kufi text-sm" required> <option value="" disabled selected>اختاري الصف</option> <option value="أول ثانوي">أول ثانوي</option> <option value="ثاني ثانوي">ثاني ثانوي</option> <option value="ثالث ثانوي">ثالث ثانوي</option> </select>
+       </div><button type="submit" class="glow-btn w-full text-white font-semibold py-3 rounded-2xl text-lg mt-4"> دخول </button>
+      </form>
+     </div>
+    </div><!-- ===== SCREEN 3: HOME ===== -->
+    <div id="screen-home" class="screen hidden-right bg-mesh flex flex-col" style="padding-bottom:80px;">
+     <div class="px-5 pt-8 pb-4">
+      <div class="flex items-center justify-between mb-5">
+       <div>
+        <p class="text-gray-500 text-xs">أهلاً 👋</p>
+        <h2 id="home-username" class="text-dpurple font-bold text-lg">الطالبة</h2>
+       </div>
+       <div class="flex gap-3">
+        <button onclick="navigateTo('screen-leaderboard')" class="w-10 h-10 rounded-xl flex items-center justify-center" style="background:rgba(212,197,240,0.6);border:1px solid rgba(157,127,209,0.2);"> <i data-lucide="trophy" style="width:18px;height:18px;color:#9d7fd1;"></i> </button>
+       </div>
+      </div><!-- Search -->
+      <div class="relative mb-5">
+       <input type="text" placeholder="ابحثي عن قصة..." class="w-full py-2.5 px-4 pr-10 rounded-xl text-sm" id="search-input" oninput="filterStories()"> <i data-lucide="search" class="absolute top-1/2 right-3 -translate-y-1/2" style="width:16px;height:16px;color:#9d7fd1;"></i>
+      </div><!-- Section Chips -->
+      <div class="flex gap-2 overflow-x-auto pb-2 mb-4" id="section-chips" style="scrollbar-width:none;">
+       <button onclick="selectSection('all')" class="section-chip active-chip whitespace-nowrap py-2 px-4 rounded-xl text-xs font-semibold" style="background:rgba(45,27,105,0.5);color:rgba(167,139,250,0.8);">الكل</button> <button onclick="selectSection('motion')" class="section-chip whitespace-nowrap py-2 px-4 rounded-xl text-xs font-semibold" style="background:rgba(45,27,105,0.5);color:rgba(167,139,250,0.8);">⚡ الحركة</button> <button onclick="selectSection('forces')" class="section-chip whitespace-nowrap py-2 px-4 rounded-xl text-xs font-semibold" style="background:rgba(45,27,105,0.5);color:rgba(167,139,250,0.8);">🧠 القوى</button> <button onclick="selectSection('energy')" class="section-chip whitespace-nowrap py-2 px-4 rounded-xl text-xs font-semibold" style="background:rgba(45,27,105,0.5);color:rgba(167,139,250,0.8);">🔋 الطاقة</button> <button onclick="selectSection('electricity')" class="section-chip whitespace-nowrap py-2 px-4 rounded-xl text-xs font-semibold" style="background:rgba(45,27,105,0.5);color:rgba(167,139,250,0.8);">💡 الكهرباء</button>
+      </div>
+     </div><!-- Story Cards -->
+     <div class="px-5 space-y-3 pb-6" id="story-list"></div><!-- Bottom Nav -->
+     <div class="fixed bottom-0 left-0 right-0 max-w-[430px] mx-auto" style="background:linear-gradient(180deg,transparent,rgba(15,5,32,0.95) 20%);padding:8px 0 12px;">
+      <div class="flex justify-around items-center px-4">
+       <button class="nav-item active-nav flex flex-col items-center gap-1 py-1 px-3" onclick="navTo('home')"> <i data-lucide="home" style="width:20px;height:20px;"></i> <span class="text-[10px]">الرئيسية</span>
+        <div class="nav-dot w-1 h-1 rounded-full bg-lpurple"></div></button> <button class="nav-item flex flex-col items-center gap-1 py-1 px-3 text-gray-500" onclick="navigateTo('screen-dashboard')"> <i data-lucide="trending-up" style="width:20px;height:20px;"></i> <span class="text-[10px]">التحليلات</span>
+        <div class="nav-dot w-1 h-1 rounded-full bg-lpurple"></div></button> <button class="nav-item flex flex-col items-center gap-1 py-1 px-3 text-gray-500" onclick="navigateTo('screen-leaderboard')"> <i data-lucide="bar-chart-3" style="width:20px;height:20px;"></i> <span class="text-[10px]">الترتيب</span>
+        <div class="nav-dot w-1 h-1 rounded-full bg-lpurple"></div></button> <button class="nav-item flex flex-col items-center gap-1 py-1 px-3 text-gray-500" onclick="navigateTo('screen-profile')"> <i data-lucide="user" style="width:20px;height:20px;"></i> <span class="text-[10px]">حسابي</span>
+        <div class="nav-dot w-1 h-1 rounded-full bg-lpurple"></div></button>
+      </div>
+     </div>
+    </div><!-- ===== SCREEN 4: STORY ===== -->
+    <div id="screen-story" class="screen hidden-right bg-mesh flex flex-col px-5 pt-8 pb-8">
+     <button onclick="navigateTo('screen-home','back')" class="text-glow mb-4 flex items-center gap-2 text-sm"> <i data-lucide="arrow-right" style="width:18px;height:18px;"></i> رجوع </button>
+     <div id="story-content" class="flex-1"></div>
+    </div><!-- ===== SCREEN 5: QUIZ ===== -->
+    <div id="screen-quiz" class="screen hidden-right bg-mesh flex flex-col px-5 pt-8 pb-8">
+     <div class="flex items-center justify-between mb-6">
+      <button onclick="navigateTo('screen-story','back')" class="text-glow flex items-center gap-2 text-sm"> <i data-lucide="arrow-right" style="width:18px;height:18px;"></i> رجوع </button> <span class="text-gray-400 text-xs" id="quiz-progress">السؤال 1 من 3</span>
+     </div>
+     <div id="quiz-content" class="flex-1"></div>
+    </div><!-- ===== SCREEN 6: RESULT ===== -->
+    <div id="screen-result" class="screen hidden-right bg-mesh flex flex-col items-center justify-center px-8 text-center">
+     <div id="result-content"></div>
+    </div><!-- ===== SCREEN 7: LEADERBOARD ===== -->
+    <div id="screen-leaderboard" class="screen hidden-right bg-mesh flex flex-col px-5 pt-8" style="padding-bottom:80px;">
+     <button onclick="navigateTo('screen-home','back')" class="text-glow mb-5 flex items-center gap-2 text-sm"> <i data-lucide="arrow-right" style="width:18px;height:18px;"></i> رجوع </button>
+     <div class="text-center mb-6">
+      <span class="text-3xl">🏆</span>
+      <h2 class="text-white font-bold text-xl mt-2">لوحة المتصدرات</h2>
+      <p class="text-gray-400 text-xs mt-1">أفضل الطالبات أداءً</p>
+     </div>
+     <div id="leaderboard-list" class="space-y-3 pb-6"></div>
+    </div><!-- ===== SCREEN 8: PROFILE ===== -->
+    <div id="screen-profile" class="screen hidden-right bg-mesh flex flex-col px-5 pt-8 pb-24"><button onclick="navigateTo('screen-home','back')" class="text-glow mb-6 flex items-center gap-2 text-sm"> <i data-lucide="arrow-right" style="width:18px;height:18px;"></i> رجوع </button>
+     <div class="text-center mb-8">
+      <div class="w-24 h-24 mx-auto rounded-full flex items-center justify-center text-5xl mb-4 pulse-glow" style="background:linear-gradient(135deg,rgba(124,58,237,0.3),rgba(6,182,212,0.2));border:2px solid rgba(167,139,250,0.3);">
+       👩‍🎓
+      </div>
+      <h2 id="profile-name" class="text-white font-bold text-xl mb-1">الطالبة</h2>
+      <p id="profile-grade" class="text-gray-400 text-sm">الصف</p>
+     </div>
+     <div class="space-y-4 mb-6">
+      <div class="card-story rounded-2xl p-5">
+       <div class="flex items-center justify-between"><span class="text-gray-400 text-sm">إجمالي النقاط</span> <span id="profile-points" class="text-glow text-2xl font-bold">0</span>
+       </div>
+      </div>
+      <div class="card-story rounded-2xl p-5">
+       <div class="flex items-center justify-between"><span class="text-gray-400 text-sm">عدد القصص المكتملة</span> <span id="profile-stories" class="text-glow text-2xl font-bold">0</span>
+       </div>
+      </div>
+      <div class="card-story rounded-2xl p-5">
+       <div class="flex items-center justify-between"><span class="text-gray-400 text-sm">متوسط النتائج</span> <span id="profile-avg" class="text-glow text-2xl font-bold">0%</span>
+       </div>
+      </div>
+     </div><button onclick="handleLogout()" class="glow-btn w-full text-white font-semibold py-3 rounded-2xl text-base"> 🚪 تسجيل الخروج </button>
+    </div><!-- ===== SCREEN 9: DASHBOARD ===== -->
+    <div id="screen-dashboard" class="screen hidden-right bg-mesh flex flex-col px-5 pt-8" style="padding-bottom:80px;"><button onclick="navigateTo('screen-home','back')" class="text-glow mb-6 flex items-center gap-2 text-sm"> <i data-lucide="arrow-right" style="width:18px;height:18px;"></i> رجوع </button>
+     <div class="mb-6">
+      <h2 class="text-white font-bold text-2xl mb-1">📊 لوحة التحليلات</h2>
+      <p class="text-gray-400 text-sm">تابعي تقدمك التعليمي</p>
+     </div>
+     <div class="space-y-4 pb-6">
+      <div class="card-story rounded-2xl p-5">
+       <div class="flex items-center justify-between mb-3"><span class="text-gray-400 text-sm">الأداء العام</span> <i data-lucide="activity" style="width:18px;height:18px;color:#a78bfa;"></i>
+       </div>
+       <div class="w-full h-2 rounded-full overflow-hidden mb-2" style="background:rgba(167,139,250,0.15);">
+        <div id="dash-performance-bar" class="h-full rounded-full" style="width:0%;background:linear-gradient(90deg,#7c3aed,#06b6d4);"></div>
+       </div>
+       <p id="dash-performance-text" class="text-white font-semibold text-lg">0%</p>
+      </div>
+      <div class="card-story rounded-2xl p-5">
+       <div class="flex items-center justify-between">
+        <div>
+         <p class="text-gray-400 text-sm mb-1">القصص المكتملة</p>
+         <p id="dash-stories-count" class="text-glow text-2xl font-bold">0</p>
+        </div><i data-lucide="book-open" style="width:32px;height:32px;color:#06b6d4;opacity:0.6;"></i>
+       </div>
+      </div>
+      <div class="card-story rounded-2xl p-5">
+       <div class="flex items-center justify-between">
+        <div>
+         <p class="text-gray-400 text-sm mb-1">إجمالي النقاط</p>
+         <p id="dash-total-points" class="text-glow text-2xl font-bold">0</p>
+        </div><i data-lucide="award" style="width:32px;height:32px;color:#10b981;opacity:0.6;"></i>
+       </div>
+      </div>
+      <div class="card-story rounded-2xl p-5">
+       <h3 class="text-white font-semibold text-sm mb-4">تقدمك في المواضيع</h3>
+       <div class="space-y-3" id="dash-sections-progress"></div>
+      </div>
+      <div class="card-story rounded-2xl p-5">
+       <h3 class="text-white font-semibold text-sm mb-4">قياس الأثر 📈</h3>
+       <div class="space-y-3" id="dash-impact-metrics"></div>
+      </div>
+      <div class="card-story rounded-2xl p-5">
+       <h3 class="text-white font-semibold text-sm mb-4">آخر النتائج</h3>
+       <div class="space-y-2 text-sm" id="dash-recent-activity">
+        <p class="text-gray-500 text-xs text-center py-4">لا توجد نتائج بعد</p>
+       </div>
+      </div>
+     </div>
+    </div>
+   </div>
+   <script>
+    // ========== APP STATE ==========
+    let currentScreen = 'screen-splash';
+    let studentName = '';
+    let studentGrade = '';
+    let currentStoryIndex = 0;
+    let currentSection = 'all';
+    let quizScore = 0;
+    let currentQuestion = 0;
+    let answeredQuestions = [];
+    let audioContext = null;
+    let oscillator = null;
+    let gainNode = null;
+    let leaderboardData = [];
+    let userStats = {
+      totalPoints: 0,
+      completedStories: 0,
+      scores: []
+    };
+
+    // ========== STORY DATA ==========
+    const stories = [
+      {
+        id: 1, section: 'motion', icon: '⚡',
+        title: 'سباق السلحفاة والأرنب',
+        duration: '5 دقائق', difficulty: 'سهل', diffColor: '#10b981',
+        text: 'في يوم من الأيام، تسابقت السلحفاة والأرنب. الأرنب كان سريعاً جداً — سرعته اللحظية عالية! لكنه توقف كثيراً في الطريق. السلحفاة كانت بطيئة لكنها لم تتوقف أبداً.\n\nهنا نتعلم الفرق بين السرعة اللحظية والسرعة المتوسطة. السرعة المتوسطة = المسافة الكلية ÷ الزمن الكلي.\n\nالسلحفاة فازت لأن سرعتها المتوسطة كانت أعلى رغم أن سرعتها اللحظية أقل!',
+        questions: [
+          { q: 'ما الفرق بين السرعة اللحظية والمتوسطة؟', options: ['اللحظية في لحظة معينة والمتوسطة للرحلة كاملة', 'لا فرق بينهما', 'المتوسطة أسرع دائماً'], correct: 0 },
+          { q: 'لماذا فازت السلحفاة؟', options: ['لأنها أسرع', 'لأن سرعتها المتوسطة أعلى', 'لأن الأرنب مريض'], correct: 1 },
+          { q: 'السرعة المتوسطة تساوي:', options: ['المسافة × الزمن', 'المسافة ÷ الزمن', 'الزمن ÷ المسافة'], correct: 1 }
+        ]
+      },
+      {
+        id: 2, section: 'forces', icon: '🧠',
+        title: 'نيوتن والتفاحة الغامضة',
+        duration: '6 دقائق', difficulty: 'متوسط', diffColor: '#f59e0b',
+        text: 'جلس نيوتن تحت شجرة التفاح وسقطت تفاحة على رأسه. لكن بدلاً من أن يأكلها، تساءل: لماذا سقطت للأسفل وليس للأعلى؟\n\nاكتشف نيوتن قوة الجاذبية — القوة التي تجذب كل الأجسام نحو مركز الأرض. هذه القوة تعتمد على كتلة الجسم والمسافة بينه وبين الأرض.\n\nبفضل هذا الاكتشاف، فهمنا لماذا نبقى على الأرض ولماذا يدور القمر حولها!',
+        questions: [
+          { q: 'ماذا اكتشف نيوتن من سقوط التفاحة؟', options: ['الكهرباء', 'قوة الجاذبية', 'المغناطيسية'], correct: 1 },
+          { q: 'قوة الجاذبية تعتمد على:', options: ['اللون فقط', 'الكتلة والمسافة', 'الشكل فقط'], correct: 1 },
+          { q: 'لماذا يدور القمر حول الأرض؟', options: ['بسبب الرياح', 'بسبب الجاذبية', 'بسبب المغناطيس'], correct: 1 }
+        ]
+      },
+      {
+        id: 3, section: 'energy', icon: '🔋',
+        title: 'الأفعوانية وسر الطاقة',
+        duration: '4 دقائق', difficulty: 'سهل', diffColor: '#10b981',
+        text: 'عندما تصعد الأفعوانية لأعلى نقطة، تكتسب طاقة وضع. وعندما تنزل بسرعة، تتحول طاقة الوضع إلى طاقة حركية!\n\nهذا هو قانون حفظ الطاقة — الطاقة لا تفنى ولا تُستحدث، بل تتحول من شكل لآخر.\n\nفي أعلى نقطة: طاقة وضع عالية + طاقة حركة منخفضة\nفي أسفل نقطة: طاقة وضع منخفضة + طاقة حركة عالية',
+        questions: [
+          { q: 'ماذا يحدث للطاقة في أعلى نقطة؟', options: ['طاقة وضع عالية', 'طاقة حركة عالية', 'لا توجد طاقة'], correct: 0 },
+          { q: 'قانون حفظ الطاقة يقول:', options: ['الطاقة تختفي', 'الطاقة تتحول ولا تفنى', 'الطاقة تزداد'], correct: 1 },
+          { q: 'في أسفل الأفعوانية:', options: ['السرعة صفر', 'طاقة الحركة عالية', 'الأفعوانية تتوقف'], correct: 1 }
+        ]
+      },
+      {
+        id: 4, section: 'electricity', icon: '💡',
+        title: 'البرق وقصة الإلكترونات',
+        duration: '7 دقائق', difficulty: 'صعب', diffColor: '#ef4444',
+        text: 'في يوم عاصف، لمع البرق في السماء! لكن ما هو البرق فعلاً؟ إنه تفريغ كهربائي ضخم بين السحب والأرض.\n\nالسحب تحمل شحنات سالبة في أسفلها وموجبة في أعلاها. عندما يصبح فرق الجهد كبيراً جداً، تنتقل الإلكترونات بسرعة هائلة — وهذا هو البرق!\n\nالتيار الكهربائي هو حركة الإلكترونات. في بيوتنا، الأسلاك توجه الإلكترونات بشكل منظم لتشغيل أجهزتنا.',
+        questions: [
+          { q: 'ما هو البرق؟', options: ['ضوء الشمس', 'تفريغ كهربائي', 'انفجار نجم'], correct: 1 },
+          { q: 'التيار الكهربائي هو:', options: ['حركة البروتونات', 'حركة الإلكترونات', 'سكون الذرات'], correct: 1 },
+          { q: 'متى يحدث البرق؟', options: ['عندما تشرق الشمس', 'عندما يكون فرق الجهد كبيراً', 'في الصباح فقط'], correct: 1 }
+        ]
+      },
+      {
+        id: 5, section: 'motion', icon: '⚡',
+        title: 'اندفاع سلمى 1️⃣',
+        duration: '3 دقائق', difficulty: 'سهل', diffColor: '#10b981',
+        text: 'كانت سلمى تركب دراجتها بسرعة، وعندما توقفت فجأة بالكبح، شعرت أن جسدها يندفع للأمام!\n\nهذا يحدث بسبب القصور الذاتي — وهو ميل الأجسام للحفاظ على حالتها من السكون أو الحركة.\n\nجسد سلمى كان يتحرك بسرعة، فعندما توقفت الدراجة، استمر جسدها في الحركة نحو الأمام حتى توقف تدريجياً. هذا ما يقوله قانون نيوتن الأول!',
+        questions: [
+          { q: 'ما سبب اندفاع سلمى للأمام؟', options: ['الجاذبية', 'القصور الذاتي', 'الاحتكاك', 'السرعة'], correct: 1 },
+          { q: 'القانون المستخدم هو قانون نيوتن:', options: ['الأول', 'الثاني', 'الثالث', 'الطاقة'], correct: 0 },
+          { q: 'القصور الذاتي يعني:', options: ['مقاومة التغير في الحركة', 'زيادة السرعة', 'توقف الجسم', 'فقدان الطاقة'], correct: 0 }
+        ]
+      },
+      {
+        id: 6, section: 'forces', icon: '🧠',
+        title: 'كرة أحمد 2️⃣',
+        duration: '3 دقائق', difficulty: 'متوسط', diffColor: '#f59e0b',
+        text: 'لعب أحمد كرة القدم. عندما ركل الكرة برفق، تحركت ببطء. وعندما ركلها بقوة أكبر، زادت سرعتها بشكل واضح!\n\nهذا يوضح العلاقة الطردية بين القوة والسرعة — كلما زادت القوة، زادت التسارع والسرعة.\n\nهذا ما يقوله قانون نيوتن الثاني: القوة = الكتلة × التسارع (F = ma)',
+        questions: [
+          { q: 'العلاقة بين القوة والسرعة؟', options: ['عكسية', 'طردية', 'ثابتة', 'لا علاقة'], correct: 1 },
+          { q: 'القانون المستخدم هو قانون نيوتن:', options: ['الثاني', 'الأول', 'الثالث', 'الاحتكاك'], correct: 0 },
+          { q: 'ماذا يحدث بزيادة القوة؟', options: ['تقل السرعة', 'تزداد السرعة', 'تتوقف الحركة', 'لا شيء'], correct: 1 }
+        ]
+      },
+      {
+        id: 7, section: 'forces', icon: '🧠',
+        title: 'ارتداد الكرة 3️⃣',
+        duration: '4 دقائق', difficulty: 'سهل', diffColor: '#10b981',
+        text: 'ألقت الكرة على الأرض بقوة، فارتدت للأعلى! الأرض مارست قوة على الكرة (رد فعل).\n\nهذا يوضح قانون نيوتن الثالث: "لكل فعل، رد فعل مساوٍ في المقدار ومعاكس في الاتجاه".\n\nالكرة ضربت الأرض بقوة نحو الأسفل، والأرض ردت بقوة مساوية نحو الأعلى، فارتدت الكرة!',
+        questions: [
+          { q: 'سبب ارتداد الكرة:', options: ['رد الفعل', 'الجاذبية', 'الطاقة', 'الكتلة'], correct: 0 },
+          { q: 'القانون المستخدم هو قانون نيوتن:', options: ['الثالث', 'الأول', 'الثاني', 'الشغل'], correct: 0 },
+          { q: 'لكل فعل:', options: ['رد فعل مساوي ومعاكس', 'لا يوجد رد فعل', 'رد ضعيف', 'رد أقوى فقط'], correct: 0 }
+        ]
+      },
+      {
+        id: 8, section: 'electricity', icon: '💡',
+        title: 'مصباح ليلى 4️⃣',
+        duration: '3 دقائق', difficulty: 'سهل', diffColor: '#10b981',
+        text: 'كانت ليلى تلعب بمصباح يدوي. عندما أغلقت الدائرة الكهربائية بالكامل (بإغلاق المفتاح)، أضاء المصباح!\n\nهذا يحدث لأن التيار الكهربائي بدأ يسري في الدائرة. التيار هو تدفق الإلكترونات من القطب السالب للموجب.\n\nعندما تكون الدائرة مفتوحة، لا يمر التيار. عندما تكون مغلقة، يسري التيار وينير المصباح!',
+        questions: [
+          { q: 'سبب إضاءة المصباح:', options: ['مرور التيار الكهربائي', 'الجاذبية', 'الحرارة', 'الضغط'], correct: 0 },
+          { q: 'نوع الدائرة عند الإضاءة:', options: ['مغلقة', 'مفتوحة', 'متوازية', 'غير كاملة'], correct: 0 },
+          { q: 'التيار الكهربائي هو:', options: ['تدفق الشحنات', 'الضوء', 'الحرارة', 'الحركة'], correct: 0 }
+        ]
+      },
+      {
+        id: 9, section: 'motion', icon: '⚡',
+        title: 'سقوط التفاحة 5️⃣',
+        duration: '3 دقائق', difficulty: 'سهل', diffColor: '#10b981',
+        text: 'شاهدت نورة تفاحة تسقط من الشجرة ببطء ثابت.\n\nالتفاحة تسقط بسبب قوة الجاذبية الأرضية، وهي القوة التي تجذب كل الأجسام نحو مركز الأرض.\n\nاكتشف العالم الشهير نيوتن هذه القوة الأساسية، والتي تفسر لماذا نبقى على الأرض ولا نطير في الهواء!',
+        questions: [
+          { q: 'سبب سقوط التفاحة:', options: ['الجاذبية الأرضية', 'الرياح', 'الضغط', 'السرعة'], correct: 0 },
+          { q: 'اتجاه قوة الجاذبية:', options: ['للأعلى', 'للأسفل', 'جانبي', 'عشوائي'], correct: 1 },
+          { q: 'من اكتشف فكرة الجاذبية؟', options: ['نيوتن', 'آينشتاين', 'جاليليو', 'أرخميدس'], correct: 0 }
+        ]
+      },
+      {
+        id: 10, section: 'forces', icon: '🧠',
+        title: 'انزلاق الكتاب 6️⃣',
+        duration: '3 دقائق', difficulty: 'متوسط', diffColor: '#f59e0b',
+        text: 'دفعت فاطمة كتاباً على الطاولة. الكتاب انزلق في البداية بسرعة، ثم تباطأ تدريجياً حتى توقف!\n\nهذا يحدث بسبب قوة الاحتكاك — وهي قوة تعارض حركة الأجسام.\n\nالاحتكاك يحدث بين سطح الكتاب وسطح الطاولة. كلما زاد الاحتكاك، قل انزلاق الجسم أسرع!\n\nبدون احتكاك، لم تتمكن الأشياء من التوقف أبداً!',
+        questions: [
+          { q: 'سبب توقف الكتاب:', options: ['الاحتكاك', 'السرعة', 'الكتلة', 'الزمن'], correct: 0 },
+          { q: 'الاحتكاك هو:', options: ['قوة معاكسة للحركة', 'مساعدة للحركة', 'ثابت دائماً', 'غير مؤثر'], correct: 0 },
+          { q: 'بزيادة الاحتكاك:', options: ['يقل الانزلاق', 'يزيد الانزلاق', 'لا يتغير', 'يختفي'], correct: 0 }
+        ]
+      },
+      {
+        id: 11, section: 'energy', icon: '🔋',
+        title: 'مصعد المدرسة 7️⃣',
+        duration: '4 دقائق', difficulty: 'متوسط', diffColor: '#f59e0b',
+        text: 'كانت سارة تركب المصعد صاعدة. عندما بدأ المصعد في الصعود بسرعة، شعرت بثقل أكثر في جسدها!\n\nهذا يحدث بسبب التسارع — عندما يتسارع المصعد للأعلى، تشعرين بوزن ظاهري أكبر.\n\nعندما ينزل المصعد بسرعة، تشعرين بخفة أكثر (وزن ظاهري أقل).\n\nهذا مثال حي على كيف يتغير الوزن الظاهري عند التسارع!',
+        questions: [
+          { q: 'سبب شعور سارة بالثقل:', options: ['التسارع', 'الجاذبية فقط', 'السرعة', 'الكتلة'], correct: 0 },
+          { q: 'الوزن الظاهري:', options: ['يتغير دائماً', 'ثابت كالوزن الحقيقي', 'يصبح صفر', 'عشوائي'], correct: 0 },
+          { q: 'عند صعود المصعد بسرعة:', options: ['يزيد الشعور بالوزن', 'يقل الشعور بالوزن', 'يختفي الوزن', 'لا يتغير'], correct: 0 }
+        ]
+      },
+      {
+        id: 12, section: 'energy', icon: '🔋',
+        title: 'الطاقة المفقودة 8️⃣',
+        duration: '4 دقائق', difficulty: 'متوسط', diffColor: '#f59e0b',
+        text: 'أرجحت دانة أرجوحة بقوة، لكن مع الوقت، بدأت تبطء وتتوقف تدريجياً.\n\nهذا يحدث بسبب الاحتكاك والمقاومة من الهواء. لكن الطاقة لم تختفِ! بل تحولت من طاقة ميكانيكية إلى حرارة وصوت.\n\nهذا يوضح قانون حفظ الطاقة: الطاقة لا تفنى ولا تُستحدث، بل تتحول من شكل إلى آخر.',
+        questions: [
+          { q: 'سبب توقف الأرجوحة:', options: ['الاحتكاك والمقاومة', 'القوة', 'الزمن', 'الكتلة'], correct: 0 },
+          { q: 'الطاقة:', options: ['تتحول ولا تفنى', 'تختفي تماماً', 'تزداد دائماً', 'تقل فقط'], correct: 0 },
+          { q: 'نوع الطاقة في الأرجوحة:', options: ['حركية', 'وضع', 'ميكانيكية (الاثنتان)', 'كهربائية'], correct: 2 }
+        ]
+      },
+      {
+        id: 13, section: 'forces', icon: '🧠',
+        title: 'المغناطيس 9️⃣',
+        duration: '4 دقائق', difficulty: 'متوسط', diffColor: '#f59e0b',
+        text: 'اقتربت منى من مغناطيس، فاقترب مسمار حديدي منه فجأة وانجذب إليه!\n\nهذا يحدث بسبب المجال المغناطيسي — وهو منطقة تؤثر فيها قوة المغناطيس.\n\nالأقطاب المتشابهة تتنافر (شمال-شمال يدفعان بعضهما)، والأقطاب المختلفة تتجاذب (شمال-جنوب يجذبان بعضهما).\n\nهذا يشبه قوة الجاذبية، لكن بدلاً من الكتلة، نتحدث عن الشحنات المغناطيسية!',
+        questions: [
+          { q: 'سبب انجذاب المسمار:', options: ['المجال المغناطيسي', 'الجاذبية', 'الحرارة', 'الضوء'], correct: 0 },
+          { q: 'الأقطاب المتشابهة والمختلفة:', options: ['المتشابهة تتنافر والمختلفة تتجاذب', 'المتشابهة تتجاذب والمختلفة تتنافر', 'جميعها تتنافر', 'تأثير ثابت'], correct: 0 },
+          { q: 'المجال المغناطيسي هو:', options: ['منطقة تأثير القوة', 'الضوء', 'الصوت', 'الحرارة'], correct: 0 }
+        ]
+      },
+      {
+        id: 14, section: 'electricity', icon: '💡',
+        title: 'الضوء والمرآة 🔟',
+        duration: '3 دقائق', difficulty: 'سهل', diffColor: '#10b981',
+        text: 'سلطت دعاء شعاع ضوء على مرآة مستوية، فانعكس الضوء بزاوية جميلة!\n\nهذا يسمى الانعكاس — عندما ينعكس الضوء عن سطح المرآة.\n\nهناك قانون مهم: زاوية السقوط = زاوية الانعكاس!\n\nهذا يعني أن الضوء الذي يسقط بزاوية معينة سينعكس بنفس الزاوية. لذلك نرى أنفسنا بوضوح في المرآة المستوية!',
+        questions: [
+          { q: 'ظاهرة انحناء الضوء على المرآة:', options: ['الانعكاس', 'الانكسار', 'الامتصاص', 'الانتشار'], correct: 0 },
+          { q: 'العلاقة بين زاوية السقوط والانعكاس:', options: ['زاوية السقوط = زاوية الانعكاس', 'زاوية السقوط أكبر', 'زاوية السقوط أصغر', 'لا علاقة'], correct: 0 },
+          { q: 'نوع المرآة في هذه القصة:', options: ['مستوية', 'مقعرة', 'محدبة', 'زجاج عادي'], correct: 0 }
+        ]
+      },
+      {
+        id: 15, section: 'energy', icon: '🔋',
+        title: 'غليان الماء 1️⃣1️⃣',
+        duration: '3 دقائق', difficulty: 'سهل', diffColor: '#10b981',
+        text: 'وضعت فاطمة قدراً من الماء على النار. مع الوقت، بدأ الماء يغلي وتصاعدت البخار!\n\nعند تسخين الماء، تزيد الطاقة الحرارية للجزيئات، فتتحرك بسرعة أكبر.\n\nعند درجة غليان معينة (100 درجة مئوية)، يتحول الماء من حالة سائلة إلى حالة غازية (بخار).\n\nهذا التحول يسمى التبخر، وهو عملية طبيعية تحدث عند درجة حرارة ثابتة!',
+        questions: [
+          { q: 'سبب غليان الماء:', options: ['زيادة الطاقة الحرارية', 'البرودة', 'الهواء', 'اللون'], correct: 0 },
+          { q: 'تتحول حالة الماء إلى:', options: ['صلبة', 'غاز', 'سائل', 'بلازما'], correct: 1 },
+          { q: 'درجة غليان الماء:', options: ['متغيرة', 'ثابتة (100°م)', 'تعتمد على الوقت', 'عشوائية'], correct: 1 }
+        ]
+      },
+      {
+        id: 16, section: 'electricity', icon: '💡',
+        title: 'الدائرة المتوازية 1️⃣2️⃣',
+        duration: '4 دقائق', difficulty: 'متوسط', diffColor: '#f59e0b',
+        text: 'في منزل جنة، عندما احترقت إحدى المصابيح، استمرت جميع المصابيح الأخرى بالعمل!\n\nهذا يحدث لأن المصابيح موصولة بدائرة متوازية. في الدائرة المتوازية، يتفرع التيار إلى عدة مسارات.\n\nكل مصباح له مساره الخاص. إذا احترقت إحدى المصابيح، يتوقف التيار فقط في ذلك الفرع، بينما تستمر الأفرع الأخرى!\n\nهذا هو السبب في أن الدوائر المتوازية تُستخدم في البيوت.',
+        questions: [
+          { q: 'نوع الدائرة في هذه الحالة:', options: ['متسلسلة', 'متوازية', 'مختلطة', 'مفتوحة'], correct: 1 },
+          { q: 'التيار في الدائرة المتوازية:', options: ['ثابت', 'يتفرع', 'يتوقف', 'ينقص فقط'], correct: 1 },
+          { q: 'عند تعطل مصباح واحد:', options: ['البقية تتوقف', 'البقية تعمل', 'كل شيء ينطفئ', 'تضاء أكثر'], correct: 1 }
+        ]
+      },
+      {
+        id: 17, section: 'motion', icon: '⚡',
+        title: 'الصوت 1️⃣3️⃣',
+        duration: '4 دقائق', difficulty: 'متوسط', diffColor: '#f59e0b',
+        text: 'في ليلة عاصفة، سمعت ريم صوت الرعد بعد أن رأت البرق!\n\nالصوت موجة تنتقل عبر وسط ناقل (مثل الهواء أو الماء).\n\nتُسمى موجات صوتية "طولية" لأن اهتزازات الوسط تحدث في نفس اتجاه انتشار الموجة.\n\nالصوت لا يمكن أن ينتقل في الفراغ (في الفضاء الخارجي) لأنه يحتاج إلى وسط ناقل. لكن الضوء ينتقل حتى في الفراغ!',
+        questions: [
+          { q: 'الصوت ينتقل عبر:', options: ['الفضاء الخالي', 'الهواء', 'الضوء', 'الكهرباء'], correct: 1 },
+          { q: 'نوع الموجات الصوتية:', options: ['مستعرضة', 'طولية', 'كهرومغناطيسية', 'ميكانيكية'], correct: 1 },
+          { q: 'الصوت يحتاج إلى:', options: ['الضوء', 'وسط ناقل', 'الكهرباء', 'الحرارة'], correct: 1 }
+        ]
+      },
+      {
+        id: 18, section: 'motion', icon: '⚡',
+        title: 'السرعة 1️⃣4️⃣',
+        duration: '3 دقائق', difficulty: 'سهل', diffColor: '#10b981',
+        text: 'كانت سيارة أحمد تقترب من المدرسة بسرعة عالية جداً!\n\nالسرعة تُقاس بقسمة المسافة على الزمن.\n\nالصيغة: السرعة = المسافة ÷ الزمن\n\nعندما تزيد المسافة في نفس الزمن، تزداد السرعة.\nعندما يزيد الزمن للمسافة نفسها، تقل السرعة.\n\nوحدة قياس السرعة هي متر/ثانية (م/ث) أو كيلومتر/ساعة (كم/س).',
+        questions: [
+          { q: 'السرعة تساوي:', options: ['المسافة × الزمن', 'المسافة ÷ الزمن', 'الزمن فقط', 'المسافة فقط'], correct: 1 },
+          { q: 'بزيادة الزمن للمسافة نفسها:', options: ['تزيد السرعة', 'تقل السرعة', 'تثبت', 'تتضاعف'], correct: 1 },
+          { q: 'وحدة السرعة:', options: ['المتر', 'الثانية', 'متر/ثانية', 'الكيلوجرام'], correct: 2 }
+        ]
+      },
+      {
+        id: 19, section: 'forces', icon: '🧠',
+        title: 'الضغط 1️⃣5️⃣',
+        duration: '4 دقائق', difficulty: 'متوسط', diffColor: '#f59e0b',
+        text: 'دخلت نورة حمام السباحة. عندما غاصت أعمق وأعمق، شعرت بضغط الماء يزداد على أذنيها وجسمها!\n\nالضغط يزداد مع العمق. هذا يحدث لأن وزن الماء فوقك يضغط عليك بقوة أكبر.\n\nالعلاقة بين الضغط والعمق طردية — كلما زاد العمق، زاد الضغط.\n\nالضغط = القوة ÷ المساحة\n\nوحدة قياس الضغط هي باسكال (Pa).',
+        questions: [
+          { q: 'الضغط يزداد مع:', options: ['الحرارة', 'العمق', 'اللون', 'الضوء'], correct: 1 },
+          { q: 'العلاقة بين الضغط والعمق:', options: ['عكسية', 'طردية', 'ثابتة', 'عشوائية'], correct: 1 },
+          { q: 'وحدة قياس الضغط:', options: ['نيوتن', 'جول', 'باسكال', 'أمبير'], correct: 2 }
+        ]
+      },
+      {
+        id: 20, section: 'electricity', icon: '💡',
+        title: 'العدسة 1️⃣6️⃣',
+        duration: '4 دقائق', difficulty: 'متوسط', diffColor: '#f59e0b',
+        text: 'استخدمت سارة عدسة محدبة لفحص نمل صغير، فبدت الصورة مكبرة جداً!\n\nالعدسة المحدبة تُكبر الصور. وهذا يحدث لأن الضوء ينكسر (ينحني) عندما يمر عبر العدسة.\n\nالانكسار هو تغيير اتجاه الضوء عند انتقاله من وسط إلى آخر.\n\nالعدسات المحدبة تستخدم في المجاهر والنظارات وآلات التصوير. العدسات المقعرة تصغر الصور.',
+        questions: [
+          { q: 'العدسة التي تكبر الصور:', options: ['مستوية', 'محدبة', 'مقعرة', 'زجاجية'], correct: 1 },
+          { q: 'تأثير العدسة المحدبة:', options: ['تصغير', 'تكبير', 'تحريف', 'إطفاء'], correct: 1 },
+          { q: 'ما يحدث للضوء:', options: ['ينعكس فقط', 'ينكسر', 'يختفي', 'يتسارع'], correct: 1 }
+        ]
+      },
+      {
+        id: 21, section: 'forces', icon: '🧠',
+        title: 'القوة والشغل 1️⃣7️⃣',
+        duration: '4 دقائق', difficulty: 'متوسط', diffColor: '#f59e0b',
+        text: 'دفعت سارة صندوقاً ثقيلاً عبر الأرض. بذلت قوة كبيرة وحركت الصندوق مسافة معينة.\n\nهذا ما يسمى "الشغل"! الشغل يحدث عندما تؤثر قوة على جسم وتحركه في اتجاه تلك القوة.\n\nالصيغة: الشغل = القوة × المسافة\n\nإذا دفعتِ الجدار بقوة كبيرة لكنه لم يتحرك (مسافة = 0)، فالشغل = 0!\n\nوحدة الشغل هي جول (J).',
+        questions: [
+          { q: 'الشغل يساوي:', options: ['القوة ÷ المسافة', 'القوة × المسافة', 'القوة فقط', 'المسافة فقط'], correct: 1 },
+          { q: 'عند دفع جدار بدون حركة:', options: ['يوجد شغل', 'لا يوجد شغل', 'شغل سالب', 'شغل لا نهائي'], correct: 1 },
+          { q: 'وحدة الشغل:', options: ['نيوتن', 'متر', 'جول', 'ثانية'], correct: 2 }
+        ]
+      },
+      {
+        id: 22, section: 'motion', icon: '⚡',
+        title: 'الزخم 1️⃣8️⃣',
+        duration: '4 دقائق', difficulty: 'متوسط', diffColor: '#f59e0b',
+        text: 'في ملعب كرة السلة، لاحظ خالد أن الكرة الثقيلة تتحرك ببطء لكن من الصعب إيقافها، بينما الكرة الخفيفة تتحرك بسرعة عالية وسهل إيقافها.\n\nهذا يوضح مفهوم الزخم! الزخم يعتمد على الكتلة والسرعة.\n\nالصيغة: الزخم (p) = الكتلة × السرعة\n\nكلما زادت الكتلة أو السرعة، زاد الزخم. الزخم مهم في القوى والاصطدامات!\n\nقانون حفظ الزخم: الزخم الكلي قبل الاصطدام = الزخم الكلي بعده.',
+        questions: [
+          { q: 'الزخم يعتمد على:', options: ['الشكل فقط', 'الكتلة والسرعة', 'اللون', 'الحرارة'], correct: 1 },
+          { q: 'بزيادة الكتلة:', options: ['يقل الزخم', 'يزيد الزخم', 'لا يتغير', 'يتضاعف'], correct: 1 },
+          { q: 'القانون هو:', options: ['F = ma', 'v = d/t', 'p = mv', 'W = F×d'], correct: 2 }
+        ]
+      },
+      {
+        id: 23, section: 'electricity', icon: '💡',
+        title: 'الكهرباء الساكنة 1️⃣9️⃣',
+        duration: '4 دقائق', difficulty: 'سهل', diffColor: '#10b981',
+        text: 'مشطت ليلى شعرها بمشط بلاستيكي جاف. بعدها، قربت المشط من قصاصات الورق، فالتصقت بالمشط!\n\nهذا يحدث بسبب الكهرباء الساكنة — تراكم الشحنات الكهربائية على سطح الجسم.\n\nعندما تمشطين الشعر، يحدث احتكاك بين الشعر والمشط. هذا الاحتكاك ينقل إلكترونات، مما يجعل المشط مشحوناً.\n\nالشحنات المختلفة تجذب بعضها البعض، فتنجذب الورقة للمشط!\n\nالكهرباء الساكنة مسؤولة عن البرق أيضاً!',
+        questions: [
+          { q: 'سبب التصاق الورق بالمشط:', options: ['الاحتكاك', 'الشحنات الكهربائية', 'الرطوبة', 'اللزوجة'], correct: 1 },
+          { q: 'نوع الكهرباء:', options: ['متحركة', 'ساكنة', 'متذبذبة', 'دورانية'], correct: 1 },
+          { q: 'تحدث بسبب:', options: ['البرودة', 'الاحتكاك', 'الرياح', 'الرطوبة'], correct: 1 }
+        ]
+      },
+      {
+        id: 24, section: 'energy', icon: '🔋',
+        title: 'الطاقة الشمسية 2️⃣0️⃣',
+        duration: '5 دقائق', difficulty: 'سهل', diffColor: '#10b981',
+        text: 'استثمرت مدرسة الحكمة في ألواح شمسية على سقف المبنى. الآن تحصل على جزء من الكهرباء من الشمس!\n\nالطاقة الشمسية تأتي من الشمس، وتُحول الألواح الشمسية طاقة الشمس إلى كهرباء.\n\nمميزات الطاقة الشمسية:\n- متجددة (الشمس لن تختفي قريباً)\n- نظيفة (لا تلوث البيئة)\n- مجانية (تأتي من الطبيعة)\n- قابلة للاستدامة\n\nهذا مثال على الطاقة المتجددة التي تساعد كوكبنا!',
+        questions: [
+          { q: 'مصدر الطاقة الشمسية:', options: ['الرياح', 'الشمس', 'الماء', 'البترول'], correct: 1 },
+          { q: 'تتحول طاقة الشمس إلى:', options: ['حرارة فقط', 'كهرباء', 'ضوء فقط', 'ميكانيكية'], correct: 1 },
+          { q: 'ميزة الطاقة الشمسية:', options: ['ملوثة', 'محدودة', 'متجددة', 'مكلفة جداً'], correct: 2 }
+        ]
+      }
+    ];
+
+    // ========== NAVIGATION ==========
+    function navigateTo(screenId, direction = 'forward') {
+      const current = document.getElementById(currentScreen);
+      const next = document.getElementById(screenId);
+      if (!current || !next || currentScreen === screenId) return;
+
+      current.classList.remove('active');
+      current.classList.add(direction === 'forward' ? 'hidden-left' : 'hidden-right');
+
+      next.classList.remove('hidden-left', 'hidden-right');
+      next.classList.add('active');
+
+      currentScreen = screenId;
+
+      // Re-init lucide icons for new screen
+      setTimeout(() => lucide.createIcons(), 50);
+
+      // Render content based on screen
+      if (screenId === 'screen-home') renderHome();
+      if (screenId === 'screen-leaderboard') renderLeaderboard();
+      if (screenId === 'screen-profile') renderProfile();
+      if (screenId === 'screen-dashboard') renderDashboard();
+    }
+
+    // ========== LOGIN ==========
+    function handleLogin(e) {
+      e.preventDefault();
+      studentName = document.getElementById('student-name').value.trim();
+      studentGrade = document.getElementById('student-grade').value;
+      if (!studentName || !studentGrade) return;
+      navigateTo('screen-home');
+    }
+
+    // ========== HOME ==========
+    function renderHome() {
+      document.getElementById('home-username').textContent = studentName || 'الطالبة';
+      renderStoryCards();
+    }
+
+    function selectSection(section) {
+      currentSection = section;
+      document.querySelectorAll('.section-chip').forEach(c => c.classList.remove('active-chip'));
+      event.target.classList.add('active-chip');
+      renderStoryCards();
+    }
+
+    function filterStories() {
+      renderStoryCards();
+    }
+
+    function renderStoryCards() {
+      const container = document.getElementById('story-list');
+      const search = (document.getElementById('search-input')?.value || '').trim().toLowerCase();
+      let filtered = stories;
+
+      if (currentSection !== 'all') {
+        filtered = filtered.filter(s => s.section === currentSection);
+      }
+      if (search) {
+        filtered = filtered.filter(s => s.title.includes(search) || s.text.includes(search));
+      }
+
+      container.innerHTML = filtered.map((story, i) => `
+        <div class="card-story rounded-2xl p-4 fade-in stagger-${(i % 4) + 1}" style="animation-fill-mode:both;">
+          <div class="flex items-start gap-3">
+            <div class="w-12 h-12 rounded-xl flex items-center justify-center text-2xl flex-shrink-0" style="background:linear-gradient(135deg,rgba(124,58,237,0.3),rgba(6,182,212,0.2));">
+              ${story.icon}
+            </div>
+            <div class="flex-1 min-w-0">
+              <h3 class="text-white font-semibold text-sm mb-1">${story.title}</h3>
+              <div class="flex items-center gap-3 text-xs text-gray-400 mb-3">
+                <span class="flex items-center gap-1"><i data-lucide="clock" style="width:12px;height:12px;"></i> ${story.duration}</span>
+                <span class="py-0.5 px-2 rounded-full text-[10px] font-semibold" style="background:${story.diffColor}22;color:${story.diffColor};">${story.difficulty}</span>
+              </div>
+              <button onclick="openStory(${story.id})" class="glow-btn text-white text-xs py-2 px-5 rounded-xl font-semibold">
+                🎧 استمع
+              </button>
+            </div>
+          </div>
+        </div>
+      `).join('');
+      setTimeout(() => lucide.createIcons(), 50);
+    }
+
+    // ========== STORY ==========
+    let isPlaying = false;
+    let playProgress = 0;
+    let playInterval = null;
+    let speechUtterance = null;
+
+    function openStory(id) {
+      const story = stories.find(s => s.id === id);
+      if (!story) return;
+      currentStoryIndex = stories.indexOf(story);
+      isPlaying = false;
+      playProgress = 0;
+      if (playInterval) clearInterval(playInterval);
+      
+      // Stop any ongoing speech
+      window.speechSynthesis.cancel();
+
+      const container = document.getElementById('story-content');
+      container.innerHTML = `
+        <div class="text-center mb-6 fade-in">
+          <div class="w-20 h-20 mx-auto rounded-2xl flex items-center justify-center text-4xl mb-3 pulse-glow" style="background:linear-gradient(135deg,rgba(124,58,237,0.3),rgba(6,182,212,0.2));border:1px solid rgba(167,139,250,0.2);">
+            ${story.icon}
+          </div>
+          <h2 class="text-white font-bold text-xl">${story.title}</h2>
+          <div class="flex items-center justify-center gap-3 mt-2 text-xs text-gray-400">
+            <span>${story.duration}</span>
+            <span class="w-1 h-1 rounded-full bg-gray-600"></span>
+            <span style="color:${story.diffColor}">${story.difficulty}</span>
+          </div>
+        </div>
+        <div class="card-story rounded-2xl p-5 mb-5 fade-in" style="animation-delay:0.15s;animation-fill-mode:both;">
+          <p class="text-gray-300 text-sm leading-7 whitespace-pre-line">${story.text}</p>
+        </div>
+        <!-- Audio Player -->
+        <div class="card-story rounded-2xl p-4 mb-5 fade-in" style="animation-delay:0.25s;animation-fill-mode:both;">
+          <div class="flex items-center gap-4">
+            <button id="play-toggle" onclick="togglePlay()" class="play-btn-big w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0">
+              <i data-lucide="play" style="width:20px;height:20px;color:white;" id="play-icon-el"></i>
+            </button>
+            <div class="flex-1">
+              <div class="w-full h-2 rounded-full overflow-hidden" style="background:rgba(167,139,250,0.15);">
+                <div id="progress-fill" class="h-full rounded-full progress-bar" style="width:0%;background:linear-gradient(90deg,#7c3aed,#06b6d4);"></div>
+              </div>
+              <div class="flex justify-between mt-1 text-[10px] text-gray-500">
+                <span id="time-current">0:00</span>
+                <span id="total-time">${story.duration}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <button onclick="startQuiz()" class="glow-btn w-full text-white font-semibold py-3 rounded-2xl text-base fade-in" style="animation-delay:0.35s;animation-fill-mode:both;">
+          🧠 ابدأ الأسئلة
+        </button>
+      `;
+      navigateTo('screen-story');
+    }
+
+    function togglePlay() {
+      const story = stories[currentStoryIndex];
+      const iconEl = document.getElementById('play-icon-el');
+      
+      if (isPlaying) {
+        // Pause
+        window.speechSynthesis.pause();
+        isPlaying = false;
+        if (playInterval) clearInterval(playInterval);
+        iconEl.setAttribute('data-lucide', 'play');
+        lucide.createIcons();
+      } else {
+        // Play
+        isPlaying = true;
+        
+        if (speechUtterance === null) {
+          // First time playing - create new utterance
+          speechUtterance = new SpeechSynthesisUtterance(story.text);
+          speechUtterance.lang = 'ar-SA';
+          speechUtterance.rate = 0.9;
+          speechUtterance.pitch = 1.4;
+          speechUtterance.volume = 1;
+          
+          // Set female voice
+          const voices = window.speechSynthesis.getVoices();
+          const femaleVoice = voices.find(v => v.lang.includes('ar') && (v.name.includes('Female') || v.name.includes('female') || v.name.includes('woman'))) || 
+                              voices.find(v => v.lang.includes('ar')) || 
+                              voices.find(v => v.name.includes('Female') || v.name.includes('female'));
+          if (femaleVoice) speechUtterance.voice = femaleVoice;
+          
+          speechUtterance.onstart = () => {
+            playProgress = 0;
+          };
+          
+          speechUtterance.onend = () => {
+            isPlaying = false;
+            playProgress = 100;
+            document.getElementById('progress-fill').style.width = '100%';
+            iconEl.setAttribute('data-lucide', 'play');
+            lucide.createIcons();
+            speechUtterance = null;
+          };
+          
+          speechUtterance.onerror = () => {
+            isPlaying = false;
+            iconEl.setAttribute('data-lucide', 'play');
+            lucide.createIcons();
+            speechUtterance = null;
+          };
+        } else {
+          // Resume paused speech
+          window.speechSynthesis.resume();
+        }
+        
+        window.speechSynthesis.speak(speechUtterance);
+        
+        iconEl.setAttribute('data-lucide', 'pause');
+        lucide.createIcons();
+        
+        // Update progress bar
+        playInterval = setInterval(() => {
+          if (isPlaying && window.speechSynthesis.speaking) {
+            playProgress += 2;
+            if (playProgress > 100) playProgress = 100;
+            document.getElementById('progress-fill').style.width = playProgress + '%';
+            const estimatedSecs = Math.floor((playProgress / 100) * 300);
+            document.getElementById('time-current').textContent = Math.floor(estimatedSecs/60) + ':' + String(estimatedSecs%60).padStart(2,'0');
+          } else if (!window.speechSynthesis.speaking && isPlaying) {
+            isPlaying = false;
+            playProgress = 100;
+            document.getElementById('progress-fill').style.width = '100%';
+            iconEl.setAttribute('data-lucide', 'play');
+            lucide.createIcons();
+            clearInterval(playInterval);
+            speechUtterance = null;
+          }
+        }, 100);
+      }
+    }
+
+    // ========== QUIZ ==========
+    function startQuiz() {
+      quizScore = 0;
+      currentQuestion = 0;
+      answeredQuestions = [];
+      navigateTo('screen-quiz');
+      renderQuestion();
+    }
+
+    function renderQuestion() {
+      const story = stories[currentStoryIndex];
+      const q = story.questions[currentQuestion];
+      document.getElementById('quiz-progress').textContent = `السؤال ${currentQuestion + 1} من ${story.questions.length}`;
+
+      const container = document.getElementById('quiz-content');
+      container.innerHTML = `
+        <div class="mb-4">
+          <div class="w-full h-1.5 rounded-full overflow-hidden mb-6" style="background:rgba(167,139,250,0.15);">
+            <div class="h-full rounded-full" style="width:${((currentQuestion) / story.questions.length) * 100}%;background:linear-gradient(90deg,#7c3aed,#06b6d4);transition:width 0.5s;"></div>
+          </div>
+        </div>
+        <div class="card-story rounded-2xl p-5 mb-5 fade-in">
+          <h3 class="text-white font-semibold text-base leading-7">${q.q}</h3>
+        </div>
+        <div class="space-y-3">
+          ${q.options.map((opt, i) => `
+            <button onclick="selectAnswer(${i}, ${q.correct})" class="quiz-option w-full text-right py-3 px-4 rounded-xl text-sm text-gray-200 fade-in stagger-${i+1}" style="animation-fill-mode:both;" id="opt-${i}">
+              <span class="inline-flex items-center justify-center w-6 h-6 rounded-full text-xs font-bold ml-2" style="background:rgba(167,139,250,0.2);color:#a78bfa;">${['أ','ب','ج'][i]}</span>
+              ${opt}
+            </button>
+          `).join('')}
+        </div>
+        <div id="answer-feedback" class="mt-4 text-center text-sm hidden"></div>
+        <button id="next-q-btn" onclick="nextQuestion()" class="glow-btn w-full text-white font-semibold py-3 rounded-2xl text-base mt-5 hidden">
+          ${currentQuestion < story.questions.length - 1 ? 'السؤال التالي' : 'عرض النتيجة'}
+        </button>
+      `;
+      setTimeout(() => lucide.createIcons(), 50);
+    }
+
+    function selectAnswer(selected, correct) {
+      if (answeredQuestions.includes(currentQuestion)) return;
+      answeredQuestions.push(currentQuestion);
+
+      const opts = document.querySelectorAll('.quiz-option');
+      opts.forEach((o, i) => {
+        o.style.pointerEvents = 'none';
+        if (i === correct) o.classList.add('correct');
+        if (i === selected && i !== correct) o.classList.add('wrong');
+      });
+
+      if (selected === correct) quizScore++;
+
+      const feedback = document.getElementById('answer-feedback');
+      feedback.classList.remove('hidden');
+      feedback.innerHTML = selected === correct
+        ? '<span class="text-emerald-400">✅ إجابة صحيحة!</span>'
+        : '<span class="text-red-400">❌ إجابة خاطئة</span>';
+
+      document.getElementById('next-q-btn').classList.remove('hidden');
+    }
+
+    function nextQuestion() {
+      const story = stories[currentStoryIndex];
+      currentQuestion++;
+      if (currentQuestion >= story.questions.length) {
+        showResult();
+      } else {
+        renderQuestion();
+      }
+    }
+
+    // ========== RESULT ==========
+    function showResult() {
+      const story = stories[currentStoryIndex];
+      const total = story.questions.length;
+      const pct = (quizScore / total) * 100;
+      let emoji, msg, msgColor;
+      if (pct >= 80) { emoji = '🎉'; msg = 'ممتاز! أداء رائع 👏'; msgColor = '#10b981'; }
+      else if (pct >= 50) { emoji = '👍'; msg = 'جيد، واصلي التقدم!'; msgColor = '#f59e0b'; }
+      else { emoji = '💪'; msg = 'حاولي مرة أخرى!'; msgColor = '#ef4444'; }
+
+      // Update user stats
+      userStats.completedStories++;
+      userStats.scores.push(pct);
+      userStats.totalPoints += quizScore * 10;
+
+      // Update leaderboard
+      const existing = leaderboardData.find(l => l.name === studentName);
+      if (existing) { existing.points += quizScore * 10; }
+      else if (studentName) { leaderboardData.push({ name: studentName, points: quizScore * 10, grade: studentGrade }); }
+      leaderboardData.sort((a, b) => b.points - a.points);
+
+      const container = document.getElementById('result-content');
+      container.innerHTML = `
+        <div class="fade-in">
+          <div class="text-6xl mb-4 float-anim">${emoji}</div>
+          <div class="w-32 h-32 mx-auto rounded-full flex items-center justify-center mb-5 pulse-glow" style="background:linear-gradient(135deg,rgba(124,58,237,0.3),rgba(6,182,212,0.2));border:2px solid ${msgColor}44;">
+            <span class="text-white text-4xl font-bold">${quizScore}/${total}</span>
+          </div>
+          <h2 class="text-white font-bold text-2xl mb-2">${msg}</h2>
+          <p class="text-gray-400 text-sm mb-8">حصلتِ على ${quizScore} من ${total} في "${story.title}"</p>
+          <div class="space-y-3">
+            <button onclick="startQuiz()" class="glow-btn w-full text-white font-semibold py-3 rounded-2xl text-base">
+              🔄 إعادة الاختبار
+            </button>
+            <button onclick="navigateTo('screen-home','back')" class="w-full text-glow font-semibold py-3 rounded-2xl text-base" style="background:rgba(45,27,105,0.5);border:1px solid rgba(167,139,250,0.2);">
+              🏠 العودة للرئيسية
+            </button>
+            <button onclick="navigateTo('screen-leaderboard')" class="w-full text-gray-400 font-semibold py-3 rounded-2xl text-sm">
+              🏆 لوحة المتصدرات
+            </button>
+          </div>
+        </div>
+      `;
+      navigateTo('screen-result');
+    }
+
+    // ========== LEADERBOARD ==========
+    function renderLeaderboard() {
+      const container = document.getElementById('leaderboard-list');
+      const medals = ['🥇', '🥈', '🥉'];
+      container.innerHTML = leaderboardData.map((entry, i) => {
+        const rowClass = i === 0 ? 'top-1' : i === 1 ? 'top-2' : i === 2 ? 'top-3' : '';
+        const isMe = entry.name === studentName;
+        return `
+          <div class="leaderboard-row ${rowClass} rounded-2xl p-4 flex items-center gap-3 fade-in stagger-${(i%4)+1}" style="animation-fill-mode:both;${isMe ? 'border-color:rgba(124,58,237,0.5);' : ''}">
+            <div class="w-10 h-10 rounded-xl flex items-center justify-center text-lg font-bold flex-shrink-0" style="background:${i < 3 ? 'linear-gradient(135deg,rgba(124,58,237,0.3),rgba(6,182,212,0.2))' : 'rgba(45,27,105,0.3)'};">
+              ${i < 3 ? medals[i] : '<span class="text-gray-500 text-sm">' + (i+1) + '</span>'}
+            </div>
+            <div class="flex-1 min-w-0">
+              <p class="text-white text-sm font-semibold truncate">${entry.name} ${isMe ? '<span class="text-[10px] text-accent">(أنتِ)</span>' : ''}</p>
+              <p class="text-gray-500 text-[10px]">${entry.grade}</p>
+            </div>
+            <div class="text-left flex-shrink-0">
+              <p class="text-glow font-bold text-sm">${entry.points}</p>
+              <p class="text-gray-600 text-[10px]">نقطة</p>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // ========== PROFILE ==========
+    function renderProfile() {
+      document.getElementById('profile-name').textContent = studentName || 'الطالبة';
+      document.getElementById('profile-grade').textContent = studentGrade || 'الصف';
+      document.getElementById('profile-points').textContent = userStats.totalPoints;
+      document.getElementById('profile-stories').textContent = userStats.completedStories;
+      const avg = userStats.scores.length > 0 ? Math.round(userStats.scores.reduce((a,b) => a+b) / userStats.scores.length) : 0;
+      document.getElementById('profile-avg').textContent = avg + '%';
+    }
+
+    function handleLogout() {
+      currentScreen = 'screen-splash';
+      studentName = '';
+      studentGrade = '';
+      userStats = { totalPoints: 0, completedStories: 0, scores: [] };
+      document.getElementById('student-name').value = '';
+      document.getElementById('student-grade').value = '';
+      document.getElementById('screen-profile').classList.remove('active');
+      document.getElementById('screen-profile').classList.add('hidden-right');
+      document.getElementById('screen-dashboard').classList.remove('active');
+      document.getElementById('screen-dashboard').classList.add('hidden-right');
+      document.getElementById('screen-splash').classList.remove('hidden-right', 'hidden-left');
+      document.getElementById('screen-splash').classList.add('active');
+      // Reset nav buttons
+      document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active-nav'));
+      document.querySelectorAll('.nav-item')[0].classList.add('active-nav');
+      setTimeout(() => lucide.createIcons(), 50);
+    }
+
+    function navTo(screen) {
+      const navItems = document.querySelectorAll('.nav-item');
+      navItems.forEach(item => item.classList.remove('active-nav'));
+      event.target.closest('.nav-item').classList.add('active-nav');
+      if (screen === 'home') navigateTo('screen-home', 'back');
+    }
+
+    // ========== DASHBOARD ==========
+    function renderDashboard() {
+      const perf = userStats.scores.length > 0 ? Math.round(userStats.scores.reduce((a,b) => a+b) / userStats.scores.length) : 0;
+      document.getElementById('dash-performance-bar').style.width = perf + '%';
+      document.getElementById('dash-performance-text').textContent = perf + '%';
+      document.getElementById('dash-stories-count').textContent = userStats.completedStories;
+      document.getElementById('dash-total-points').textContent = userStats.totalPoints;
+
+      // Sections progress
+      const sections = { motion: 0, forces: 0, energy: 0, electricity: 0 };
+      const sectionNames = { motion: '⚡ الحركة', forces: '🧠 القوى', energy: '🔋 الطاقة', electricity: '💡 الكهرباء' };
+      
+      // Count stories per section
+      stories.forEach(s => {
+        if (sections.hasOwnProperty(s.section)) {
+          sections[s.section]++;
+        }
+      });
+
+      const progressContainer = document.getElementById('dash-sections-progress');
+      progressContainer.innerHTML = Object.entries(sections).map(([sec, count]) => {
+        const totalInSection = count;
+        const progress = Math.min(Math.round((userStats.completedStories / 24) * 100 * (count / 24)), 100);
+        return `
+          <div>
+            <div class="flex justify-between mb-1">
+              <span class="text-gray-300 text-xs">${sectionNames[sec]}</span>
+              <span class="text-glow text-xs font-semibold">${progress}%</span>
+            </div>
+            <div class="w-full h-1.5 rounded-full overflow-hidden" style="background:rgba(167,139,250,0.15);">
+              <div class="h-full rounded-full" style="width:${progress}%;background:linear-gradient(90deg,#7c3aed,#06b6d4);"></div>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      // Impact metrics
+      const impactContainer = document.getElementById('dash-impact-metrics');
+      const impactData = calculateImpactMetrics();
+      impactContainer.innerHTML = `
+        <div class="grid grid-cols-2 gap-3">
+          <div class="rounded-lg p-3" style="background:rgba(16,185,129,0.15);border:1px solid rgba(16,185,129,0.3);">
+            <div class="text-[10px] text-gray-400 mb-1">معدل النجاح</div>
+            <div class="text-lg font-bold text-emerald-400">${impactData.successRate}%</div>
+          </div>
+          <div class="rounded-lg p-3" style="background:rgba(59,130,246,0.15);border:1px solid rgba(59,130,246,0.3);">
+            <div class="text-[10px] text-gray-400 mb-1">التحسن</div>
+            <div class="text-lg font-bold text-blue-400">${impactData.improvement > 0 ? '+' : ''}${impactData.improvement}%</div>
+          </div>
+          <div class="rounded-lg p-3" style="background:rgba(245,158,11,0.15);border:1px solid rgba(245,158,11,0.3);">
+            <div class="text-[10px] text-gray-400 mb-1">متوسط الأداء</div>
+            <div class="text-lg font-bold text-amber-400">${impactData.avgPerformance}%</div>
+          </div>
+          <div class="rounded-lg p-3" style="background:rgba(168,85,247,0.15);border:1px solid rgba(168,85,247,0.3);">
+            <div class="text-[10px] text-gray-400 mb-1">الاتساق</div>
+            <div class="text-lg font-bold text-purple-400">${impactData.consistency}%</div>
+          </div>
+        </div>
+      `;
+
+      // Recent activity
+      const recentContainer = document.getElementById('dash-recent-activity');
+      if (userStats.scores.length > 0) {
+        recentContainer.innerHTML = userStats.scores.slice(-3).reverse().map((score, i) => `
+          <div class="flex items-center justify-between p-2 rounded-lg" style="background:rgba(167,139,250,0.1);">
+            <span class="text-gray-300 text-xs">القصة #${userStats.scores.length - i}</span>
+            <span class="text-glow font-semibold text-sm">${score}%</span>
+          </div>
+        `).join('');
+      }
+    }
+
+    function calculateImpactMetrics() {
+      const scores = userStats.scores;
+      if (scores.length === 0) {
+        return { successRate: 0, improvement: 0, avgPerformance: 0, consistency: 100 };
+      }
+
+      // معدل النجاح: نسبة الدرجات >= 80%
+      const successCount = scores.filter(s => s >= 80).length;
+      const successRate = Math.round((successCount / scores.length) * 100);
+
+      // التحسن: الفرق بين آخر درجة والأولى
+      const firstScore = scores[0];
+      const lastScore = scores[scores.length - 1];
+      const improvement = lastScore - firstScore;
+
+      // متوسط الأداء
+      const avgPerformance = Math.round(scores.reduce((a, b) => a + b) / scores.length);
+
+      // الاتساق: درجة الثبات (100 - معامل التباين)
+      const variance = scores.reduce((sum, score) => sum + Math.pow(score - avgPerformance, 2), 0) / scores.length;
+      const stdDev = Math.sqrt(variance);
+      const consistency = Math.max(0, Math.round(100 - (stdDev / avgPerformance) * 50));
+
+      return { successRate, improvement, avgPerformance, consistency };
+    }
+
+    // ========== ELEMENT SDK ==========
+    const defaultConfig = {
+      app_title: 'رِواق',
+      splash_text: 'هنا تتحول الفيزياء إلى قصة تُروى… لا تُحفظ',
+      school_name: 'مجمع السحن',
+      background_color: '#020205',
+      surface_color: '#0d0620',
+      text_color: '#000000',
+      accent_color: '#6d28d9',
+      secondary_accent: '#0891b2',
+      font_family: 'Noto Kufi Arabic',
+      font_size: 14
+    };
+
+    function applyConfig(config) {
+      const t = config.app_title || defaultConfig.app_title;
+      const s = config.splash_text || defaultConfig.splash_text;
+      const sc = config.school_name || defaultConfig.school_name;
+      const bg = config.background_color || defaultConfig.background_color;
+      const sf = config.surface_color || defaultConfig.surface_color;
+      const tc = config.text_color || defaultConfig.text_color;
+      const ac = config.accent_color || defaultConfig.accent_color;
+      const sa = config.secondary_accent || defaultConfig.secondary_accent;
+      const ff = config.font_family || defaultConfig.font_family;
+      const fs = config.font_size || defaultConfig.font_size;
+
+      // Splash text
+      const splashTitle = document.getElementById('splash-title');
+      if (splashTitle) splashTitle.textContent = t;
+      const splashSub = document.getElementById('splash-subtitle');
+      if (splashSub) splashSub.textContent = '"' + s + '"';
+      const splashSchool = document.getElementById('splash-school');
+      if (splashSchool) splashSchool.textContent = sc;
+
+      // Colors
+      document.documentElement.style.setProperty('--bg', bg);
+      document.body.style.background = bg;
+
+      // Font
+      const fontStack = `${ff}, sans-serif`;
+      document.body.style.fontFamily = fontStack;
+
+      // Font size
+      document.body.style.fontSize = fs + 'px';
+    }
+
+    window.elementSdk.init({
+      defaultConfig,
+      onConfigChange: async (config) => { applyConfig(config); },
+      mapToCapabilities: (config) => ({
+        recolorables: [
+          { get: () => config.background_color || defaultConfig.background_color, set: (v) => { config.background_color = v; window.elementSdk.setConfig({ background_color: v }); } },
+          { get: () => config.surface_color || defaultConfig.surface_color, set: (v) => { config.surface_color = v; window.elementSdk.setConfig({ surface_color: v }); } },
+          { get: () => config.text_color || defaultConfig.text_color, set: (v) => { config.text_color = v; window.elementSdk.setConfig({ text_color: v }); } },
+          { get: () => config.accent_color || defaultConfig.accent_color, set: (v) => { config.accent_color = v; window.elementSdk.setConfig({ accent_color: v }); } },
+          { get: () => config.secondary_accent || defaultConfig.secondary_accent, set: (v) => { config.secondary_accent = v; window.elementSdk.setConfig({ secondary_accent: v }); } }
+        ],
+        borderables: [],
+        fontEditable: { get: () => config.font_family || defaultConfig.font_family, set: (v) => { config.font_family = v; window.elementSdk.setConfig({ font_family: v }); } },
+        fontSizeable: { get: () => config.font_size || defaultConfig.font_size, set: (v) => { config.font_size = v; window.elementSdk.setConfig({ font_size: v }); } }
+      }),
+      mapToEditPanelValues: (config) => new Map([
+        ['app_title', config.app_title || defaultConfig.app_title],
+        ['splash_text', config.splash_text || defaultConfig.splash_text],
+        ['school_name', config.school_name || defaultConfig.school_name]
+      ])
+    });
+
+    // Init icons
+    document.addEventListener('DOMContentLoaded', () => {
+      lucide.createIcons();
+      applyConfig(defaultConfig);
+    });
+  </script>
+  </div>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9de7e179349770eb',t:'MTc3Mzg3NTExMi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
