@@ -124,9 +124,17 @@
   <style>body { box-sizing: border-box; }</style>
   <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
  </head>
- <body class="h-full bg-dpurple font-kufi"><!-- Phone Frame -->
+ <body class="h-full bg-dpurple font-kufi"><!-- Loading indicator -->
+  <div id="data-loading" class="fixed inset-0 flex items-center justify-center z-50" style="background:rgba(0,0,0,0.9);display:none;">
+   <div class="text-center">
+    <div class="w-12 h-12 rounded-full border-4 border-transparent border-t-glow mx-auto mb-4" style="animation:spin 1s linear infinite;"></div>
+    <p class="text-white text-sm">جاري تحميل البيانات...</p>
+   </div>
+  </div>
+  <style>@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }</style><!-- Phone Frame -->
   <div id="app-wrapper" class="w-full h-full flex items-center justify-center bg-mesh overflow-hidden">
-   <div id="phone-frame" class="relative w-full h-full max-w-[430px] overflow-hidden" style="background: linear-gradient(180deg, #fef3c7, #fde68a);"><!-- ===== SCREEN 1: SPLASH ===== -->
+   <div id="phone-frame" class="relative w-full h-full max-w-[430px] overflow-hidden" style="background: linear-gradient(180deg, #fef3c7, #fde68a);">
+    <!-- ===== SCREEN 1: SPLASH ===== -->
     <div id="screen-splash" class="screen active bg-mesh flex flex-col items-center justify-center px-8 text-center">
      <div class="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
       <div class="absolute w-64 h-64 rounded-full" style="top:-10%;right:-20%;background:radial-gradient(circle,rgba(245,158,11,0.2),transparent 70%)"></div>
@@ -153,7 +161,8 @@
      <div class="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
       <div class="absolute w-56 h-56 rounded-full" style="top:5%;left:-10%;background:radial-gradient(circle,rgba(157,127,209,0.12),transparent 70%)"></div>
      </div>
-     <div class="relative z-10"><button onclick="navigateTo('screen-splash','back')" class="text-glow mb-6 flex items-center gap-2 text-sm"> <i data-lucide="arrow-right" style="width:18px;height:18px;"></i> رجوع </button>
+     <div class="relative z-10">
+      <button onclick="navigateTo('screen-splash','back')" class="text-glow mb-6 flex items-center gap-2 text-sm"> <i data-lucide="arrow-right" style="width:18px;height:18px;"></i> رجوع </button>
       <div class="text-center mb-8">
        <div class="text-5xl mb-3">
         🎧
@@ -162,9 +171,11 @@
        <p class="text-sm mt-1" style="color:#7c6ba3;">سجلي دخولك للبدء</p>
       </div>
       <form id="login-form" onsubmit="handleLogin(event)" class="space-y-5">
-       <div><label for="student-name" class="text-gray-600 text-sm block mb-2">اسم الطالبة</label> <input type="text" id="student-name" placeholder="أدخلي اسمك هنا..." class="w-full py-3 px-4 rounded-xl font-kufi text-sm" required>
+       <div>
+        <label for="student-name" class="text-gray-600 text-sm block mb-2">اسم الطالبة</label> <input type="text" id="student-name" placeholder="أدخلي اسمك هنا..." class="w-full py-3 px-4 rounded-xl font-kufi text-sm" required>
        </div>
-       <div><label for="student-grade" class="text-gray-600 text-sm block mb-2">الصف</label> <select id="student-grade" class="w-full py-3 px-4 rounded-xl font-kufi text-sm" required> <option value="" disabled selected>اختاري الصف</option> <option value="أول ثانوي">أول ثانوي</option> <option value="ثاني ثانوي">ثاني ثانوي</option> <option value="ثالث ثانوي">ثالث ثانوي</option> </select>
+       <div>
+        <label for="student-grade" class="text-gray-600 text-sm block mb-2">الصف</label> <select id="student-grade" class="w-full py-3 px-4 rounded-xl font-kufi text-sm" required> <option value="" disabled selected>اختاري الصف</option> <option value="أول ثانوي">أول ثانوي</option> <option value="ثاني ثانوي">ثاني ثانوي</option> <option value="ثالث ثانوي">ثالث ثانوي</option> </select>
        </div><button type="submit" class="glow-btn w-full text-white font-semibold py-3 rounded-2xl text-lg mt-4"> دخول </button>
       </form>
      </div>
@@ -176,17 +187,21 @@
         <p class="text-gray-500 text-xs">أهلاً 👋</p>
         <h2 id="home-username" class="text-dpurple font-bold text-lg">الطالبة</h2>
        </div>
-       <div class="flex gap-3"><button onclick="navigateTo('screen-leaderboard')" class="w-10 h-10 rounded-xl flex items-center justify-center" style="background:rgba(212,197,240,0.6);border:1px solid rgba(157,127,209,0.2);"> <i data-lucide="trophy" style="width:18px;height:18px;color:#9d7fd1;"></i> </button>
+       <div class="flex gap-3">
+        <button onclick="navigateTo('screen-leaderboard')" class="w-10 h-10 rounded-xl flex items-center justify-center" style="background:rgba(212,197,240,0.6);border:1px solid rgba(157,127,209,0.2);"> <i data-lucide="trophy" style="width:18px;height:18px;color:#9d7fd1;"></i> </button>
        </div>
       </div><!-- Search -->
-      <div class="relative mb-5"><input type="text" placeholder="ابحثي عن قصة..." class="w-full py-2.5 px-4 pr-10 rounded-xl text-sm" id="search-input" oninput="filterStories()"> <i data-lucide="search" class="absolute top-1/2 right-3 -translate-y-1/2" style="width:16px;height:16px;color:#9d7fd1;"></i>
+      <div class="relative mb-5">
+       <input type="text" placeholder="ابحثي عن قصة..." class="w-full py-2.5 px-4 pr-10 rounded-xl text-sm" id="search-input" oninput="filterStories()"> <i data-lucide="search" class="absolute top-1/2 right-3 -translate-y-1/2" style="width:16px;height:16px;color:#9d7fd1;"></i>
       </div><!-- Section Chips -->
-      <div class="flex gap-2 overflow-x-auto pb-2 mb-4" id="section-chips" style="scrollbar-width:none;"><button onclick="selectSection('all')" class="section-chip active-chip whitespace-nowrap py-2 px-4 rounded-xl text-xs font-semibold" style="background:rgba(45,27,105,0.5);color:rgba(167,139,250,0.8);">الكل</button> <button onclick="selectSection('motion')" class="section-chip whitespace-nowrap py-2 px-4 rounded-xl text-xs font-semibold" style="background:rgba(45,27,105,0.5);color:rgba(167,139,250,0.8);">⚡ الحركة</button> <button onclick="selectSection('forces')" class="section-chip whitespace-nowrap py-2 px-4 rounded-xl text-xs font-semibold" style="background:rgba(45,27,105,0.5);color:rgba(167,139,250,0.8);">🧠 القوى</button> <button onclick="selectSection('energy')" class="section-chip whitespace-nowrap py-2 px-4 rounded-xl text-xs font-semibold" style="background:rgba(45,27,105,0.5);color:rgba(167,139,250,0.8);">🔋 الطاقة</button> <button onclick="selectSection('electricity')" class="section-chip whitespace-nowrap py-2 px-4 rounded-xl text-xs font-semibold" style="background:rgba(45,27,105,0.5);color:rgba(167,139,250,0.8);">💡 الكهرباء</button>
+      <div class="flex gap-2 overflow-x-auto pb-2 mb-4" id="section-chips" style="scrollbar-width:none;">
+       <button onclick="selectSection('all')" class="section-chip active-chip whitespace-nowrap py-2 px-4 rounded-xl text-xs font-semibold" style="background:rgba(45,27,105,0.5);color:rgba(167,139,250,0.8);">الكل</button> <button onclick="selectSection('motion')" class="section-chip whitespace-nowrap py-2 px-4 rounded-xl text-xs font-semibold" style="background:rgba(45,27,105,0.5);color:rgba(167,139,250,0.8);">⚡ الحركة</button> <button onclick="selectSection('forces')" class="section-chip whitespace-nowrap py-2 px-4 rounded-xl text-xs font-semibold" style="background:rgba(45,27,105,0.5);color:rgba(167,139,250,0.8);">🧠 القوى</button> <button onclick="selectSection('energy')" class="section-chip whitespace-nowrap py-2 px-4 rounded-xl text-xs font-semibold" style="background:rgba(45,27,105,0.5);color:rgba(167,139,250,0.8);">🔋 الطاقة</button> <button onclick="selectSection('electricity')" class="section-chip whitespace-nowrap py-2 px-4 rounded-xl text-xs font-semibold" style="background:rgba(45,27,105,0.5);color:rgba(167,139,250,0.8);">💡 الكهرباء</button>
       </div>
      </div><!-- Story Cards -->
      <div class="px-5 space-y-3 pb-6" id="story-list"></div><!-- Bottom Nav -->
      <div class="fixed bottom-0 left-0 right-0 max-w-[430px] mx-auto" style="background:linear-gradient(180deg,transparent,rgba(15,5,32,0.95) 20%);padding:8px 0 12px;">
-      <div class="flex justify-around items-center px-4"><button class="nav-item active-nav flex flex-col items-center gap-1 py-1 px-3" onclick="navTo('home')"> <i data-lucide="home" style="width:20px;height:20px;"></i> <span class="text-[10px]">الرئيسية</span>
+      <div class="flex justify-around items-center px-4">
+       <button class="nav-item active-nav flex flex-col items-center gap-1 py-1 px-3" onclick="navTo('home')"> <i data-lucide="home" style="width:20px;height:20px;"></i> <span class="text-[10px]">الرئيسية</span>
         <div class="nav-dot w-1 h-1 rounded-full bg-lpurple"></div></button> <button class="nav-item flex flex-col items-center gap-1 py-1 px-3 text-gray-500" onclick="navigateTo('screen-dashboard')"> <i data-lucide="trending-up" style="width:20px;height:20px;"></i> <span class="text-[10px]">التحليلات</span>
         <div class="nav-dot w-1 h-1 rounded-full bg-lpurple"></div></button> <button class="nav-item flex flex-col items-center gap-1 py-1 px-3 text-gray-500" onclick="navigateTo('screen-leaderboard')"> <i data-lucide="bar-chart-3" style="width:20px;height:20px;"></i> <span class="text-[10px]">الترتيب</span>
         <div class="nav-dot w-1 h-1 rounded-full bg-lpurple"></div></button> <button class="nav-item flex flex-col items-center gap-1 py-1 px-3 text-gray-500" onclick="navigateTo('screen-profile')"> <i data-lucide="user" style="width:20px;height:20px;"></i> <span class="text-[10px]">حسابي</span>
@@ -194,26 +209,29 @@
       </div>
      </div>
     </div><!-- ===== SCREEN 4: STORY ===== -->
-    <div id="screen-story" class="screen hidden-right bg-mesh flex flex-col px-5 pt-8 pb-8"><button onclick="navigateTo('screen-home','back')" class="text-glow mb-4 flex items-center gap-2 text-sm"> <i data-lucide="arrow-right" style="width:18px;height:18px;"></i> رجوع </button>
+    <div id="screen-story" class="screen hidden-right bg-mesh flex flex-col px-5 pt-8 pb-8">
+     <button onclick="navigateTo('screen-home','back')" class="text-glow mb-4 flex items-center gap-2 text-sm"> <i data-lucide="arrow-right" style="width:18px;height:18px;"></i> رجوع </button>
      <div id="story-content" class="flex-1"></div>
     </div><!-- ===== SCREEN 5: QUIZ ===== -->
     <div id="screen-quiz" class="screen hidden-right bg-mesh flex flex-col px-5 pt-8 pb-8">
-     <div class="flex items-center justify-between mb-6"><button onclick="navigateTo('screen-story','back')" class="text-glow flex items-center gap-2 text-sm"> <i data-lucide="arrow-right" style="width:18px;height:18px;"></i> رجوع </button> <span class="text-gray-400 text-xs" id="quiz-progress">السؤال 1 من 3</span>
+     <div class="flex items-center justify-between mb-6">
+      <button onclick="navigateTo('screen-story','back')" class="text-glow flex items-center gap-2 text-sm"> <i data-lucide="arrow-right" style="width:18px;height:18px;"></i> رجوع </button> <span class="text-gray-400 text-xs" id="quiz-progress">السؤال 1 من 3</span>
      </div>
      <div id="quiz-content" class="flex-1"></div>
     </div><!-- ===== SCREEN 6: RESULT ===== -->
     <div id="screen-result" class="screen hidden-right bg-mesh flex flex-col items-center justify-center px-8 text-center">
      <div id="result-content"></div>
     </div><!-- ===== SCREEN 7: LEADERBOARD ===== -->
-    <div id="screen-leaderboard" class="screen hidden-right bg-mesh flex flex-col px-5 pt-8" style="padding-bottom:80px;"><button onclick="navigateTo('screen-home','back')" class="text-glow mb-5 flex items-center gap-2 text-sm"> <i data-lucide="arrow-right" style="width:18px;height:18px;"></i> رجوع </button>
-     <div class="text-center mb-6"><span class="text-3xl">🏆</span>
+    <div id="screen-leaderboard" class="screen hidden-right bg-mesh flex flex-col px-5 pt-8" style="padding-bottom:80px;">
+     <button onclick="navigateTo('screen-home','back')" class="text-glow mb-5 flex items-center gap-2 text-sm"> <i data-lucide="arrow-right" style="width:18px;height:18px;"></i> رجوع </button>
+     <div class="text-center mb-6">
+      <span class="text-3xl">🏆</span>
       <h2 class="text-white font-bold text-xl mt-2">لوحة المتصدرات</h2>
       <p class="text-gray-400 text-xs mt-1">أفضل الطالبات أداءً</p>
      </div>
      <div id="leaderboard-list" class="space-y-3 pb-6"></div>
     </div><!-- ===== SCREEN 8: PROFILE ===== -->
-    <div id="screen-profile" class="screen hidden-right bg-mesh flex flex-col px-5 pt-8 pb-24">
-     <button onclick="navigateTo('screen-home','back')" class="text-glow mb-6 flex items-center gap-2 text-sm"> <i data-lucide="arrow-right" style="width:18px;height:18px;"></i> رجوع </button>
+    <div id="screen-profile" class="screen hidden-right bg-mesh flex flex-col px-5 pt-8 pb-24"><button onclick="navigateTo('screen-home','back')" class="text-glow mb-6 flex items-center gap-2 text-sm"> <i data-lucide="arrow-right" style="width:18px;height:18px;"></i> رجوع </button>
      <div class="text-center mb-8">
       <div class="w-24 h-24 mx-auto rounded-full flex items-center justify-center text-5xl mb-4 pulse-glow" style="background:linear-gradient(135deg,rgba(124,58,237,0.3),rgba(6,182,212,0.2));border:2px solid rgba(167,139,250,0.3);">
        👩‍🎓
@@ -223,28 +241,27 @@
      </div>
      <div class="space-y-4 mb-6">
       <div class="card-story rounded-2xl p-5">
-       <div class="flex items-center justify-between">
-        <span class="text-gray-400 text-sm">إجمالي النقاط</span> <span id="profile-points" class="text-glow text-2xl font-bold">0</span>
+       <div class="flex items-center justify-between"><span class="text-gray-400 text-sm">إجمالي النقاط</span> <span id="profile-points" class="text-glow text-2xl font-bold">0</span>
        </div>
       </div>
       <div class="card-story rounded-2xl p-5">
-       <div class="flex items-center justify-between">
-        <span class="text-gray-400 text-sm">عدد القصص المكتملة</span> <span id="profile-stories" class="text-glow text-2xl font-bold">0</span>
+       <div class="flex items-center justify-between"><span class="text-gray-400 text-sm">عدد القصص المكتملة</span> <span id="profile-stories" class="text-glow text-2xl font-bold">0</span>
        </div>
       </div>
       <div class="card-story rounded-2xl p-5">
-       <div class="flex items-center justify-between">
-        <span class="text-gray-400 text-sm">متوسط النتائج</span> <span id="profile-avg" class="text-glow text-2xl font-bold">0%</span>
+       <div class="flex items-center justify-between"><span class="text-gray-400 text-sm">متوسط النتائج</span> <span id="profile-avg" class="text-glow text-2xl font-bold">0%</span>
        </div>
       </div>
      </div>
-     <div class="space-y-2"><button onclick="handleLogout()" class="glow-btn w-full text-white font-semibold py-3 rounded-2xl text-base"> 🚪 تسجيل الخروج </button> <button onclick="showDeleteConfirm()" class="w-full text-red-400 font-semibold py-2 rounded-2xl text-sm" style="background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.3);"> 🗑️ حذف الحساب </button>
+     <div class="space-y-2">
+      <button onclick="handleLogout()" class="glow-btn w-full text-white font-semibold py-3 rounded-2xl text-base"> 🚪 تسجيل الخروج </button> <button onclick="showDeleteConfirm()" class="w-full text-red-400 font-semibold py-2 rounded-2xl text-sm" style="background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.3);"> 🗑️ حذف الحساب </button>
      </div><!-- Delete Confirmation Modal -->
      <div id="delete-confirm-modal" class="hidden fixed inset-0 flex items-center justify-center p-4" style="background:rgba(0,0,0,0.7);z-index:1000;">
       <div class="card-story rounded-2xl p-6 max-w-xs w-full">
        <h3 class="text-white font-bold text-lg mb-2">تأكيد الحذف</h3>
        <p class="text-gray-300 text-sm mb-5">هل أنتِ متأكدة من رغبتك في حذف حسابك؟ سيتم حذف جميع بياناتك.</p>
-       <div class="flex gap-3"><button onclick="confirmDeleteAccount()" class="flex-1 bg-red-600 hover:bg-red-700 text-white font-semibold py-2 rounded-lg text-sm"> حذف </button> <button onclick="hideDeleteConfirm()" class="flex-1 text-white font-semibold py-2 rounded-lg text-sm" style="background:rgba(45,27,105,0.5);"> إلغاء </button>
+       <div class="flex gap-3">
+        <button onclick="confirmDeleteAccount()" class="flex-1 bg-red-600 hover:bg-red-700 text-white font-semibold py-2 rounded-lg text-sm"> حذف </button> <button onclick="hideDeleteConfirm()" class="flex-1 text-white font-semibold py-2 rounded-lg text-sm" style="background:rgba(45,27,105,0.5);"> إلغاء </button>
        </div>
       </div>
      </div>
@@ -253,16 +270,14 @@
       .edit-section.active { display: block; }
      </style>
     </div><!-- ===== SCREEN 9: DASHBOARD ===== -->
-    <div id="screen-dashboard" class="screen hidden-right bg-mesh flex flex-col px-5 pt-8" style="padding-bottom:80px;">
-     <button onclick="navigateTo('screen-home','back')" class="text-glow mb-6 flex items-center gap-2 text-sm"> <i data-lucide="arrow-right" style="width:18px;height:18px;"></i> رجوع </button>
+    <div id="screen-dashboard" class="screen hidden-right bg-mesh flex flex-col px-5 pt-8" style="padding-bottom:80px;"><button onclick="navigateTo('screen-home','back')" class="text-glow mb-6 flex items-center gap-2 text-sm"> <i data-lucide="arrow-right" style="width:18px;height:18px;"></i> رجوع </button>
      <div class="mb-6">
       <h2 class="text-white font-bold text-2xl mb-1">📊 لوحة التحليلات</h2>
       <p class="text-gray-400 text-sm">تابعي تقدمك التعليمي</p>
      </div>
      <div class="space-y-4 pb-6">
       <div class="card-story rounded-2xl p-5">
-       <div class="flex items-center justify-between mb-3">
-        <span class="text-gray-400 text-sm">الأداء العام</span> <i data-lucide="activity" style="width:18px;height:18px;color:#a78bfa;"></i>
+       <div class="flex items-center justify-between mb-3"><span class="text-gray-400 text-sm">الأداء العام</span> <i data-lucide="activity" style="width:18px;height:18px;color:#a78bfa;"></i>
        </div>
        <div class="w-full h-2 rounded-full overflow-hidden mb-2" style="background:rgba(167,139,250,0.15);">
         <div id="dash-performance-bar" class="h-full rounded-full" style="width:0%;background:linear-gradient(90deg,#7c3aed,#06b6d4);"></div>
@@ -321,35 +336,89 @@
       completedStories: 0,
       scores: []
     };
+    let currentUserRecord = null; // Track current user's data record for updates
 
-    // ========== LOCAL STORAGE FUNCTIONS ==========
-    function saveToLocalStorage() {
-      const data = {
-        studentName,
-        studentGrade,
-        userStats,
-        leaderboardData,
-        completedStories: Array.from(new Set(userStats.completedStories ? [currentStoryIndex] : []))
-      };
-      localStorage.setItem('riwaqAppData', JSON.stringify(data));
-    }
+    // ========== DATA SDK HANDLER ==========
+    const dataHandler = {
+      onDataChanged(data) {
+        // Reload user stats and leaderboard from database
+        if (data && data.length > 0) {
+          // Reconstruct leaderboard
+          leaderboardData = data.map(record => ({
+            name: record.student_name,
+            grade: record.student_grade,
+            points: record.total_points
+          })).sort((a, b) => b.points - a.points);
 
-    function loadFromLocalStorage() {
-      const saved = localStorage.getItem('riwaqAppData');
-      if (saved) {
-        try {
-          const data = JSON.parse(saved);
-          studentName = data.studentName || '';
-          studentGrade = data.studentGrade || '';
-          userStats = data.userStats || { totalPoints: 0, completedStories: 0, scores: [] };
-          leaderboardData = data.leaderboardData || [];
-          return true;
-        } catch (e) {
-          console.error('Error loading data:', e);
-          return false;
+          // Find current user's record
+          const currentRecord = data.find(r => r.student_name === studentName);
+          if (currentRecord) {
+            currentUserRecord = currentRecord;
+            userStats.totalPoints = currentRecord.total_points;
+            userStats.completedStories = currentRecord.completed_stories;
+            try {
+              userStats.scores = JSON.parse(currentRecord.scores || '[]');
+            } catch (e) {
+              userStats.scores = [];
+            }
+          }
         }
       }
-      return false;
+    };
+
+    // ========== INITIALIZE DATA SDK ==========
+    async function initDataSdk() {
+      const result = await window.dataSdk.init(dataHandler);
+      if (!result.isOk) {
+        console.error('Failed to initialize Data SDK');
+      }
+    }
+
+    // ========== SAVE TO DATABASE ==========
+    async function saveToDatabase() {
+      if (!studentName) return;
+
+      const dataToSave = {
+        student_name: studentName,
+        student_grade: studentGrade,
+        completed_stories: userStats.completedStories,
+        total_points: userStats.totalPoints,
+        scores: JSON.stringify(userStats.scores),
+        leaderboard_data: JSON.stringify(leaderboardData),
+        created_at: new Date().toISOString()
+      };
+
+      if (currentUserRecord && currentUserRecord.__backendId) {
+        // Update existing record
+        const updateResult = await window.dataSdk.update({
+          ...currentUserRecord,
+          ...dataToSave
+        });
+        if (updateResult.isOk) {
+          console.log('Data updated successfully');
+        } else {
+          console.error('Failed to update data:', updateResult.error);
+        }
+      } else {
+        // Create new record
+        const createResult = await window.dataSdk.create(dataToSave);
+        if (createResult.isOk) {
+          console.log('Data created successfully');
+        } else {
+          console.error('Failed to create data:', createResult.error);
+        }
+      }
+    }
+
+    // ========== LOAD USER DATA FROM DATABASE ==========
+    async function loadUserDataFromDatabase() {
+      // Data SDK automatically calls onDataChanged with all records
+      // We'll search for current user in the data
+      return new Promise(resolve => {
+        setTimeout(() => {
+          resolve();
+        }, 500);
+      });
     }
 
     // ========== STORY DATA ==========
@@ -651,12 +720,15 @@
       studentGrade = document.getElementById('student-grade').value;
       if (!studentName || !studentGrade) return;
       
-      // Save to Local Storage
-      localStorage.setItem('studentName', studentName);
-      localStorage.setItem('studentGrade', studentGrade);
-      saveToLocalStorage();
+      // Show loading indicator
+      document.getElementById('data-loading').style.display = 'flex';
       
-      navigateTo('screen-home');
+      // Load user data from database
+      setTimeout(async () => {
+        await loadUserDataFromDatabase();
+        document.getElementById('data-loading').style.display = 'none';
+        navigateTo('screen-home');
+      }, 500);
     }
 
     // ========== HOME ==========
@@ -940,8 +1012,8 @@
       else if (studentName) { leaderboardData.push({ name: studentName, points: quizScore * 10, grade: studentGrade }); }
       leaderboardData.sort((a, b) => b.points - a.points);
 
-      // Save all data to Local Storage
-      saveToLocalStorage();
+      // Save to database
+      saveToDatabase();
 
       const container = document.getElementById('result-content');
       container.innerHTML = `
@@ -1061,13 +1133,18 @@
       studentGrade = '';
       userStats = { totalPoints: 0, completedStories: 0, scores: [] };
       leaderboardData = [];
+      currentUserRecord = null;
       document.getElementById('student-name').value = '';
       document.getElementById('student-grade').value = '';
       
-      // Clear from Local Storage
-      localStorage.removeItem('studentName');
-      localStorage.removeItem('studentGrade');
-      localStorage.removeItem('riwaqAppData');
+      // Delete from database
+      if (currentUserRecord && currentUserRecord.__backendId) {
+        window.dataSdk.delete(currentUserRecord).then(result => {
+          if (!result.isOk) {
+            console.error('Failed to delete data:', result.error);
+          }
+        });
+      }
       
       // Hide modal
       document.getElementById('delete-confirm-modal').classList.add('hidden');
@@ -1091,13 +1168,9 @@
       studentName = '';
       studentGrade = '';
       userStats = { totalPoints: 0, completedStories: 0, scores: [] };
+      currentUserRecord = null;
       document.getElementById('student-name').value = '';
       document.getElementById('student-grade').value = '';
-      
-      // Clear from Local Storage
-      localStorage.removeItem('studentName');
-      localStorage.removeItem('studentGrade');
-      localStorage.removeItem('riwaqAppData');
       
       document.getElementById('screen-profile').classList.remove('active');
       document.getElementById('screen-profile').classList.add('hidden-right');
@@ -1285,39 +1358,15 @@
     });
 
     // Init icons
-    document.addEventListener('DOMContentLoaded', () => {
+    document.addEventListener('DOMContentLoaded', async () => {
       lucide.createIcons();
       applyConfig(defaultConfig);
       
-      // Load saved student data from Local Storage
-      if (loadFromLocalStorage()) {
-        // Data was successfully loaded
-        document.getElementById('student-name').value = studentName;
-        document.getElementById('student-grade').value = studentGrade;
-        
-        // Auto-login after short delay
-        setTimeout(() => {
-          navigateTo('screen-home');
-        }, 800);
-      } else {
-        // No saved data, check for old-style localStorage
-        const savedName = localStorage.getItem('studentName');
-        const savedGrade = localStorage.getItem('studentGrade');
-        
-        if (savedName && savedGrade) {
-          studentName = savedName;
-          studentGrade = savedGrade;
-          document.getElementById('student-name').value = savedName;
-          document.getElementById('student-grade').value = savedGrade;
-          
-          // Auto-login after short delay
-          setTimeout(() => {
-            navigateTo('screen-home');
-          }, 800);
-        }
-      }
+      // Initialize Data SDK first
+      await initDataSdk();
     });
   </script>
   </div>
- <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9de834d323132743',t:'MTc3Mzg3ODUyNi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
-</html>rounded-2xl p-5">
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9de8ae9e47d0794c',t:'MTc3Mzg4MzUxNC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
+ font-semibold text-base leading-7">${q.q}</h3>
